@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Voice Sales Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/*──────────────────────────────────────────
+  RESET & TOKENS
+──────────────────────────────────────────*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f7;
+  --white:#fff;
+  --border:#e2e6ef;
+  --border2:#cdd2e0;
+  --sidebar:#1a2236;
+  --sidebar-hover:#243049;
+  --sidebar-active:#2d3c57;
+  --orange:#f97316;
+  --orange-lt:#fff4ed;
+  --orange-dk:#ea6b0c;
+  --blue:#1a73e8;
+  --blue-lt:#e8f0fe;
+  --green:#16a34a;
+  --green-lt:#f0fdf4;
+  --red:#dc2626;
+  --red-lt:#fef2f2;
+  --amber:#d97706;
+  --amber-lt:#fffbeb;
+  --purple:#7c3aed;
+  --purple-lt:#f5f3ff;
+  --text:#0f172a;
+  --text2:#374151;
+  --muted:#6b7280;
+  --faint:#9ca3af;
+  --r:10px;--r-sm:7px;--r-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.16);
+  --sidebar-w:230px;
+  --top-h:58px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px;line-height:1.5}
+
+/*──────────────────────────────────────────
+  SIDEBAR
+──────────────────────────────────────────*/
+.sidebar{
+  width:var(--sidebar-w);position:fixed;top:0;left:0;bottom:0;
+  background:var(--sidebar);display:flex;flex-direction:column;z-index:200;
+  transition:transform .22s;
+}
+.sb-logo{
+  height:var(--top-h);display:flex;align-items:center;gap:10px;
+  padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;
+}
+.sb-logo-mark{
+  width:32px;height:32px;border-radius:8px;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.sb-logo-text{color:#fff;font-size:14px;font-weight:700;line-height:1.2}
+.sb-logo-sub{color:rgba(255,255,255,.4);font-size:10px;font-weight:400}
+
+.sb-section{
+  padding:16px 18px 4px;font-size:10px;font-weight:600;
+  color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;
+}
+.sb-link{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;margin:1px 8px;border-radius:var(--r-sm);
+  color:rgba(255,255,255,.6);font-size:13.5px;font-weight:500;
+  cursor:pointer;border:none;background:none;text-align:left;
+  width:calc(100% - 16px);transition:all .13s;
+}
+.sb-link svg{width:16px;height:16px;opacity:.7;flex-shrink:0}
+.sb-link:hover{background:var(--sidebar-hover);color:#fff}
+.sb-link.active{background:var(--sidebar-active);color:#fff}
+.sb-link.active svg{opacity:1}
+.sb-link .sb-badge{
+  margin-left:auto;background:var(--orange);color:#fff;
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center;
+}
+
+.sb-footer{
+  margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.07);
+}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-avatar{
+  width:32px;height:32px;border-radius:50%;background:var(--orange);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;
+}
+.sb-uname{color:#fff;font-size:13px;font-weight:600}
+.sb-urole{color:rgba(255,255,255,.4);font-size:11px}
+
+/*──────────────────────────────────────────
+  TOPBAR
+──────────────────────────────────────────*/
+.topbar{
+  position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--top-h);
+  background:var(--white);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;box-shadow:var(--shadow);
+}
+.top-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.top-breadcrumb span{color:var(--text);font-weight:600;font-size:15px}
+.top-right{display:flex;align-items:center;gap:8px}
+.live-badge{
+  display:flex;align-items:center;gap:5px;background:var(--green-lt);
+  color:var(--green);font-size:11.5px;font-weight:600;
+  padding:4px 10px;border-radius:20px;border:1px solid #bbf7d0;
+}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.icon-btn{
+  width:34px;height:34px;border:1px solid var(--border);border-radius:var(--r-sm);
+  background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:14px;transition:all .13s;
+}
+.icon-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt)}
+
+/*──────────────────────────────────────────
+  MAIN
+──────────────────────────────────────────*/
+.main{margin-left:var(--sidebar-w);padding-top:var(--top-h);flex:1;min-height:100vh}
+.page{padding:22px 24px;display:none}
+.page.active{display:block}
+
+/*──────────────────────────────────────────
+  PAGE HEADER
+──────────────────────────────────────────*/
+.page-header{margin-bottom:20px}
+.page-header h2{font-size:18px;font-weight:700;color:var(--text)}
+.page-header p{font-size:13px;color:var(--muted);margin-top:2px}
+
+/*──────────────────────────────────────────
+  KPI CARDS (dashboard)
+──────────────────────────────────────────*/
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;position:relative;overflow:hidden;box-shadow:var(--shadow);
+  transition:box-shadow .15s;
+}
+.kpi:hover{box-shadow:var(--shadow-md)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.k1::before{background:var(--orange)}
+.kpi.k2::before{background:var(--blue)}
+.kpi.k3::before{background:var(--green)}
+.kpi.k4::before{background:var(--purple)}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.kpi-label{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kpi-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.k1 .kpi-ico{background:var(--orange-lt)} .k2 .kpi-ico{background:var(--blue-lt)}
+.k3 .kpi-ico{background:var(--green-lt)} .k4 .kpi-ico{background:var(--purple-lt)}
+.kpi-val{font-size:26px;font-weight:700;margin-bottom:3px}
+.kpi-sub{font-size:11.5px;color:var(--muted)}
+
+/*──────────────────────────────────────────
+  CARD / TABLE
+──────────────────────────────────────────*/
+.card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+.card-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:400px}
+thead tr{background:var(--bg)}
+th{
+  padding:9px 14px;text-align:left;font-size:11px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:11px 14px;font-size:13.5px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:#f8faff}
+.td-main{font-weight:600;color:var(--text)}
+.td-mono{font-family:monospace;font-size:12px;color:var(--faint)}
+.td-muted{color:var(--muted);font-size:13px}
+
+.row-acts{display:flex;gap:5px}
+.row-btn{
+  width:28px;height:28px;border-radius:6px;border:1px solid var(--border);
+  background:none;cursor:pointer;color:var(--muted);font-size:12px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;
+}
+.row-btn:hover{background:var(--bg);border-color:var(--border2);color:var(--text)}
+.row-btn.edit:hover{color:var(--blue);border-color:#bfdbfe;background:var(--blue-lt)}
+.row-btn.del:hover{color:var(--red);border-color:#fecaca;background:var(--red-lt)}
+.row-btn.restore:hover{color:var(--green);border-color:#bbf7d0;background:var(--green-lt)}
+
+/*──────────────────────────────────────────
+  TOOLBAR / SEARCH
+──────────────────────────────────────────*/
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;
+}
+.toolbar-l{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.toolbar-r{display:flex;align-items:center;gap:8px}
+.search-box{
+  display:flex;align-items:center;gap:7px;background:var(--bg);
+  border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 11px;width:210px;
+  transition:border-color .15s;
+}
+.search-box:focus-within{border-color:var(--orange);background:var(--white)}
+.search-box input{border:none;outline:none;font-size:13px;color:var(--text);width:100%;background:none;font-family:inherit}
+.search-box input::placeholder{color:var(--faint)}
+.sel{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:6px 10px;font-size:13px;color:var(--text2);font-family:inherit;outline:none;cursor:pointer;
+}
+.sel:focus{border-color:var(--orange)}
+
+/*──────────────────────────────────────────
+  BUTTONS
+──────────────────────────────────────────*/
+.btn{
+  display:inline-flex;align-items:center;gap:6px;border:none;
+  border-radius:var(--r-sm);padding:7px 15px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap;
+}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:var(--orange-dk);transform:translateY(-1px);box-shadow:0 4px 12px rgba(249,115,22,.28)}
+.btn-primary:active{transform:none;box-shadow:none}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:#1558c0}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#15803d}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-ghost{background:none;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/*──────────────────────────────────────────
+  PILLS / CHIPS
+──────────────────────────────────────────*/
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
+.pill-green{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.pill-red{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+.pill-blue{background:var(--blue-lt);color:#1d4ed8;border:1px solid #bfdbfe}
+.pill-orange{background:var(--orange-lt);color:var(--orange);border:1px solid #fed7aa}
+.alias-chip{background:var(--orange-lt);color:var(--orange);border:1px solid #fed7aa;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500}
+
+/*──────────────────────────────────────────
+  PAGER
+──────────────────────────────────────────*/
+.pager{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+.pg-btns{display:flex;gap:3px}
+.pg-btn{min-width:30px;height:28px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 6px;transition:all .12s;font-family:monospace}
+.pg-btn:hover{border-color:var(--border2);color:var(--text)}
+.pg-btn.cur{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/*──────────────────────────────────────────
+  SUMMARY BOXES
+──────────────────────────────────────────*/
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 18px;background:var(--bg);border-top:1px solid var(--border)}
+.sum-box{background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:10px}
+.sum-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sum-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.sum-val{font-size:18px;font-weight:700;color:var(--text)}
+
+/*──────────────────────────────────────────
+  SALES FILTER BAR
+──────────────────────────────────────────*/
+.filter-bar{
+  padding:12px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;background:var(--white);
+}
+.filter-group{display:flex;flex-direction:column;gap:4px;min-width:140px}
+.filter-group label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.filter-group input,.filter-group select{
+  padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;
+  transition:border-color .14s;
+}
+.filter-group input:focus,.filter-group select:focus{border-color:var(--orange);background:var(--white)}
+.filter-actions{display:flex;gap:6px;align-items:flex-end;padding-bottom:0}
+
+/* quick date chips */
+.quick-dates{display:flex;gap:5px;flex-wrap:wrap}
+.qd-btn{
+  padding:4px 11px;border-radius:20px;font-size:12px;font-weight:500;
+  border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;
+  transition:all .13s;font-family:inherit;
+}
+.qd-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-lt)}
+.qd-btn.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/*──────────────────────────────────────────
+  MODAL
+──────────────────────────────────────────*/
+.modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);
+  z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px);
+}
+.modal-bg.open{display:flex}
+.modal{
+  background:var(--white);border-radius:var(--r-lg);width:480px;
+  max-width:96vw;max-height:90vh;overflow-y:auto;
+  box-shadow:var(--shadow-lg);animation:popIn .18s ease;
+}
+@keyframes popIn{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px 22px 0}
+.modal-title{font-size:16px;font-weight:700}
+.modal-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.modal-x{
+  width:30px;height:30px;border-radius:7px;border:1px solid var(--border);
+  background:none;cursor:pointer;color:var(--muted);font-size:18px;
+  display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;
+  transition:all .12s;
+}
+.modal-x:hover{color:var(--red);border-color:#fecaca;background:var(--red-lt)}
+.modal-body{padding:18px 22px}
+.modal-foot{padding:12px 22px 20px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border)}
+
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:8px 11px;font-size:13.5px;
+  border:1px solid var(--border2);border-radius:var(--r-sm);
+  font-family:inherit;color:var(--text);background:var(--bg);outline:none;
+  transition:border-color .14s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--orange);background:var(--white)}
+.fg textarea{min-height:80px;resize:vertical}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg-hint{font-size:11.5px;color:var(--faint);margin-top:4px}
+
+/* TAG INPUT */
+.tag-wrap{
+  min-height:72px;border:1px solid var(--border2);border-radius:var(--r-sm);
+  background:var(--bg);padding:7px;cursor:text;
+  display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;
+  transition:border-color .14s;
+}
+.tag-wrap:focus-within{border-color:var(--orange);background:var(--white)}
+.tag-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--orange-lt);color:var(--orange);border:1px solid #fed7aa;
+  padding:3px 9px 3px 10px;border-radius:20px;font-size:12.5px;font-weight:500;
+  animation:chipIn .12s ease;
+}
+@keyframes chipIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+.tag-chip-x{cursor:pointer;font-size:14px;border:none;background:none;color:var(--orange);opacity:.7;padding:0;line-height:1;font-family:inherit}
+.tag-chip-x:hover{opacity:1}
+.tag-input-field{border:none;outline:none;background:none;font-family:inherit;font-size:13px;color:var(--text);min-width:110px;flex:1;padding:3px 4px}
+.tag-input-field::placeholder{color:var(--faint)}
+
+/* CONFIRM */
+.confirm-card{background:var(--white);border-radius:var(--r-lg);width:360px;max-width:96vw;padding:28px;box-shadow:var(--shadow-lg);text-align:center;animation:popIn .18s ease}
+.confirm-icon{font-size:38px;margin-bottom:12px}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.confirm-msg{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:22px}
+.confirm-btns{display:flex;gap:8px;justify-content:center}
+
+/*──────────────────────────────────────────
+  TOAST
+──────────────────────────────────────────*/
+.toast-wrap{position:fixed;bottom:22px;right:22px;z-index:999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{
+  background:var(--white);border:1px solid var(--border2);border-radius:9px;
+  padding:11px 16px;font-size:13px;color:var(--text);
+  display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-md);
+  animation:toastIn .18s ease;min-width:200px;max-width:300px;pointer-events:all;
+}
+@keyframes toastIn{from{transform:translateX(18px);opacity:0}to{transform:none;opacity:1}}
+.t-ok .t-ic{color:var(--green)}.t-err .t-ic{color:var(--red)}.t-info .t-ic{color:var(--blue)}
+
+/* EMPTY */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:34px;opacity:.25;display:block;margin-bottom:10px}
+.empty p{font-size:13.5px}
+
+/* VAL ERR */
+.val-err{font-size:11.5px;color:var(--red);margin-top:4px;display:none}
+.val-err.show{display:block}
+
+/*──────────────────────────────────────────
+  RESPONSIVE
+──────────────────────────────────────────*/
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.mob-open{transform:none}
+  .main{margin-left:0}
+  .topbar{left:0}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:540px){
+  .kpi-row{grid-template-columns:1fr}
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .filter-group{min-width:unset}
+}
+</style>
+</head>
+<body>
+
+<!--═══════════════ SIDEBAR ═══════════════-->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">🍽</div>
+    <div>
+      <div class="sb-logo-text">VoiceSales</div>
+      <div class="sb-logo-sub">Admin Console</div>
+    </div>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <button class="sb-link active" onclick="showPage('sales',this)" data-page="sales">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 000 4h6a2 2 0 000-4M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Sales Data
+  </button>
+
+  <div class="sb-section">Manage</div>
+  <button class="sb-link" onclick="openModal('menuModal');resetMenuForm()" data-action="menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    Menu Items
+  </button>
+  <button class="sb-link" onclick="openModal('aliasModal');resetAliasForm()" data-action="alias">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10M7 12h6M7 17h8"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    Food Aliases
+  </button>
+  <button class="sb-link" onclick="openModal('binModal')" data-action="bin">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+    Recycle Bin
+    <span class="sb-badge" id="binBadge" style="display:none">0</span>
+  </button>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">A</div>
+      <div>
+        <div class="sb-uname">Admin</div>
+        <div class="sb-urole">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!--═══════════════ TOPBAR ═══════════════-->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="icon-btn" id="mobToggle" onclick="toggleSidebar()" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div>
+      <div class="top-breadcrumb">
+        Voice Sales &rsaquo; <span id="pageLabel">Sales Data</span>
+      </div>
+    </div>
+  </div>
+  <div class="top-right">
+    <span class="live-badge"><span class="live-dot"></span> Live</span>
+    <button class="icon-btn" title="Refresh (R)" onclick="loadAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/></svg>
+    </button>
+    <button class="icon-btn" title="Notifications">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+  </div>
+</header>
+
+<!--═══════════════ MAIN ═══════════════-->
+<div class="main">
+
+  <!--── SALES PAGE ──-->
+  <div class="page active" id="page-sales">
+    <div style="padding:22px 24px 0">
+      <div class="page-header">
+        <h2>Sales Data</h2>
+        <p>View, filter and export all sales records</p>
+      </div>
+
+      <!-- KPI row -->
+      <div class="kpi-row">
+        <div class="kpi k1">
+          <div class="kpi-top"><div class="kpi-label">Total Revenue</div><div class="kpi-ico">💰</div></div>
+          <div class="kpi-val" id="kpiRev">—</div>
+          <div class="kpi-sub" id="kpiRevSub">All time</div>
+        </div>
+        <div class="kpi k2">
+          <div class="kpi-top"><div class="kpi-label">Orders</div><div class="kpi-ico">🧾</div></div>
+          <div class="kpi-val" id="kpiOrders">—</div>
+          <div class="kpi-sub" id="kpiOrdersSub">Records loaded</div>
+        </div>
+        <div class="kpi k3">
+          <div class="kpi-top"><div class="kpi-label">Total Qty</div><div class="kpi-ico">📦</div></div>
+          <div class="kpi-val" id="kpiQty">—</div>
+          <div class="kpi-sub">Units sold</div>
+        </div>
+        <div class="kpi k4">
+          <div class="kpi-top"><div class="kpi-label">Top Item</div><div class="kpi-ico">🔥</div></div>
+          <div class="kpi-val" id="kpiTop" style="font-size:15px;margin-top:6px">—</div>
+          <div class="kpi-sub">Best seller</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Card -->
+    <div style="padding:0 24px 24px">
+      <div class="card">
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filterBar">
+          <!-- Quick date chips -->
+          <div class="filter-group" style="min-width:unset">
+            <label>Quick Filter</label>
+            <div class="quick-dates">
+              <button class="qd-btn" onclick="quickDate('today',this)">Today</button>
+              <button class="qd-btn" onclick="quickDate('yesterday',this)">Yesterday</button>
+              <button class="qd-btn" onclick="quickDate('week',this)">This Week</button>
+              <button class="qd-btn" onclick="quickDate('month',this)">This Month</button>
+              <button class="qd-btn" onclick="quickDate('all',this)">All</button>
+            </div>
+          </div>
+
+          <!-- Exact date (button-triggered) -->
+          <div class="filter-group">
+            <label>Exact Date</label>
+            <input type="text" id="filterDate" placeholder="DD-MM-YYYY" onkeydown="if(event.key==='Enter')applyDateFilter()">
+          </div>
+
+          <!-- Range -->
+          <div class="filter-group">
+            <label>Start Date</label>
+            <input type="text" id="startDate" placeholder="DD-MM-YYYY">
+          </div>
+          <div class="filter-group">
+            <label>End Date</label>
+            <input type="text" id="endDate" placeholder="DD-MM-YYYY">
+          </div>
+
+          <!-- Food -->
+          <div class="filter-group">
+            <label>Food Item</label>
+            <select id="foodFilter" onchange="loadSales()">
+              <option value="">All Foods</option>
+            </select>
+          </div>
+
+          <!-- Actions -->
+          <div class="filter-actions">
+            <button class="btn btn-primary" onclick="applyDateFilter()" title="Apply date filter">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              Filter
+            </button>
+            <button class="btn btn-ghost" onclick="clearSalesFilters()">Clear</button>
+            <button class="btn btn-success" onclick="downloadSalesPdf()" title="Download PDF">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Toolbar (search + add) -->
+        <div class="toolbar">
+          <div class="toolbar-l">
+            <div class="search-box">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="salesSearch" placeholder="Search food, date…" oninput="filterSalesTable()">
+            </div>
+          </div>
+          <div class="toolbar-r">
+            <span id="salesRowInfo" style="font-size:12px;color:var(--muted)"></span>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortSales('id')" style="cursor:pointer">ID ↕</th>
+                <th onclick="sortSales('date')" style="cursor:pointer">Date ↕</th>
+                <th onclick="sortSales('food_name')" style="cursor:pointer">Food ↕</th>
+                <th onclick="sortSales('quantity')" style="cursor:pointer">Qty ↕</th>
+                <th onclick="sortSales('price')" style="cursor:pointer">Price ↕</th>
+                <th onclick="sortSales('total')" style="cursor:pointer">Total ↕</th>
+              </tr>
+            </thead>
+            <tbody id="salesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="summary-row">
+          <div class="sum-box">
+            <div class="sum-ico" style="background:var(--blue-lt)">📋</div>
+            <div><div class="sum-label">Rows</div><div class="sum-val" id="salesRows">0</div></div>
+          </div>
+          <div class="sum-box">
+            <div class="sum-ico" style="background:var(--green-lt)">📦</div>
+            <div><div class="sum-label">Total Qty</div><div class="sum-val" id="salesQty">0</div></div>
+          </div>
+          <div class="sum-box">
+            <div class="sum-ico" style="background:var(--orange-lt)">💰</div>
+            <div><div class="sum-label">Total Amount</div><div class="sum-val" id="salesTotal">0</div></div>
+          </div>
+        </div>
+
+        <div class="pager">
+          <span id="salesPgInfo">—</span>
+          <div class="pg-btns" id="salesPg"></div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- /page-sales -->
+
+</div><!-- /main -->
+
+<!--═══════════════ MODALS ═══════════════-->
+
+<!-- MENU MODAL -->
+<div class="modal-bg" id="menuModal" onclick="bgClick(event,'menuModal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="menuModalTitle">Add Menu Item</div>
+        <div class="modal-sub">Fill in the food details below</div>
+      </div>
+      <button class="modal-x" onclick="closeModal('menuModal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg-row">
+        <div class="fg">
+          <label>Food Name <span style="color:var(--red)">*</span></label>
+          <input id="menuItem" placeholder="e.g. IDLI">
+          <div class="val-err" id="menuItemErr">Food name is required.</div>
+        </div>
+        <div class="fg">
+          <label>Tamil Word</label>
+          <input id="tamilWord" placeholder="Optional">
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg">
+          <label>Category</label>
+          <input id="category" placeholder="e.g. Breakfast">
+        </div>
+        <div class="fg">
+          <label>Price <span style="color:var(--red)">*</span></label>
+          <input type="number" id="menuPrice" placeholder="30">
+          <div class="val-err" id="menuPriceErr">Price is required.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('menuModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMenuItem()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ALIAS MODAL -->
+<div class="modal-bg" id="aliasModal" onclick="bgClick(event,'aliasModal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="aliasModalTitle">Add Food Alias</div>
+        <div class="modal-sub">Map alternate voice names to a menu item</div>
+      </div>
+      <button class="modal-x" onclick="closeModal('aliasModal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Food Name <span style="color:var(--red)">*</span></label>
+        <select id="aliasMenuId">
+          <option value="">Select food…</option>
+        </select>
+        <div class="val-err" id="aliasFoodErr">Select a food item.</div>
+      </div>
+      <div class="fg">
+        <label>Aliases <span style="color:var(--red)">*</span></label>
+        <div class="tag-wrap" id="tagWrap" onclick="document.getElementById('tagField').focus()">
+          <input class="tag-input-field" id="tagField"
+            placeholder="Type alias then press Enter… or paste comma list"
+            onkeydown="tagKey(event)" onpaste="tagPaste(event)">
+        </div>
+        <div class="val-err" id="aliasTagErr">Add at least one alias.</div>
+        <div class="fg-hint">Press <b>Enter</b> after each alias. Duplicates auto-removed.</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('aliasModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAlias()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Save Aliases
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BIN MODAL -->
+<div class="modal-bg" id="binModal" onclick="bgClick(event,'binModal')">
+  <div class="modal" style="width:580px">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Recycle Bin</div>
+        <div class="modal-sub">Restore or permanently delete removed items</div>
+      </div>
+      <button class="modal-x" onclick="closeModal('binModal')">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Deleted Menu Items</div>
+        <div class="card" style="box-shadow:none">
+          <div class="tbl-wrap" style="max-height:200px;overflow-y:auto">
+            <table>
+              <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Action</th></tr></thead>
+              <tbody id="binMenuBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Deleted Aliases</div>
+        <div class="card" style="box-shadow:none">
+          <div class="tbl-wrap" style="max-height:200px;overflow-y:auto">
+            <table>
+              <thead><tr><th>Item</th><th>Alias</th><th>Action</th></tr></thead>
+              <tbody id="binAliasBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('binModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENU LIST MODAL (view/manage) -->
+<div class="modal-bg" id="menuListModal" onclick="bgClick(event,'menuListModal')">
+  <div class="modal" style="width:620px">
+    <div class="modal-head">
+      <div><div class="modal-title">Menu Items</div><div class="modal-sub">All active menu items</div></div>
+      <button class="modal-x" onclick="closeModal('menuListModal')">&#x2715;</button>
+    </div>
+    <div class="modal-body" style="padding-top:12px">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn btn-primary btn-sm" onclick="closeModal('menuListModal');openModal('menuModal');resetMenuForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:12px;height:12px"><path d="M12 5v14M5 12h14"/></svg>
+          Add New
+        </button>
+      </div>
+      <div class="card" style="box-shadow:none">
+        <div class="tbl-wrap" style="max-height:360px;overflow-y:auto">
+          <table>
+            <thead><tr><th>Name</th><th>Tamil</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+            <tbody id="menuListBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('menuListModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- ALIAS LIST MODAL -->
+<div class="modal-bg" id="aliasListModal" onclick="bgClick(event,'aliasListModal')">
+  <div class="modal" style="width:620px">
+    <div class="modal-head">
+      <div><div class="modal-title">Food Aliases</div><div class="modal-sub">All voice recognition aliases</div></div>
+      <button class="modal-x" onclick="closeModal('aliasListModal')">&#x2715;</button>
+    </div>
+    <div class="modal-body" style="padding-top:12px">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn btn-primary btn-sm" onclick="closeModal('aliasListModal');openModal('aliasModal');resetAliasForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:12px;height:12px"><path d="M12 5v14M5 12h14"/></svg>
+          Add Alias
+        </button>
+      </div>
+      <div class="card" style="box-shadow:none">
+        <div class="tbl-wrap" style="max-height:360px;overflow-y:auto">
+          <table>
+            <thead><tr><th>Item</th><th>Alias</th><th>Actions</th></tr></thead>
+            <tbody id="aliasListBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('aliasListModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmModal">
+  <div class="confirm-card">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/*═══════════════════════════════════════════
+  STATE
+═══════════════════════════════════════════*/
+let editingMenuId=null, editingAliasId=null;
+let tags=[];
+let allSales=[], filteredSales=[], salesSort={k:'id',d:1};
+const SALES_PAGE=15;
+let salesPg=1;
+
+/*═══════════════════════════════════════════
+  UTILS
+═══════════════════════════════════════════*/
+const text=v=>(v===null||v===undefined)?'':String(v);
+const money=v=>Number(v||0).toFixed(2);
+
+async function requestJson(url,opts={}){
+  const r=await fetch(url,opts);
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.message||'Request failed');
+  return d;
+}
+
+/*═══════════════════════════════════════════
+  NAVIGATION
+═══════════════════════════════════════════*/
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('pageLabel').textContent=
+    {sales:'Sales Data',menu:'Menu Items',alias:'Food Aliases',bin:'Recycle Bin'}[name]||name;
+}
+
+/*═══════════════════════════════════════════
+  MODAL HELPERS
+═══════════════════════════════════════════*/
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='binModal') loadBin();
+  if(id==='menuModal'||id==='menuListModal') loadMenuList();
+  if(id==='aliasModal'||id==='aliasListModal'){loadAliasList();loadAliasMenuOptions();}
+}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function bgClick(e,id){if(e.target===document.getElementById(id))closeModal(id)}
+
+/*═══════════════════════════════════════════
+  SIDEBAR CLICK OVERRIDES (open right modal)
+═══════════════════════════════════════════*/
+document.querySelectorAll('.sb-link[data-action]').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const action=this.dataset.action;
+    if(action==='menu')    { openModal('menuListModal'); }
+    if(action==='alias')   { openModal('aliasListModal'); }
+    if(action==='bin')     { openModal('binModal'); }
+  });
+});
+
+/*═══════════════════════════════════════════
+  MOBILE SIDEBAR
+═══════════════════════════════════════════*/
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('mob-open')}
+
+/*═══════════════════════════════════════════
+  TOAST
+═══════════════════════════════════════════*/
+function toast(msg,type='ok'){
+  const icons={ok:'✅',err:'❌',info:'ℹ️'};
+  const cls={ok:'t-ok',err:'t-err',info:'t-info'};
+  const el=document.createElement('div');
+  el.className=`toast ${cls[type]||'t-ok'}`;
+  el.innerHTML=`<span class="t-ic">${icons[type]||'✅'}</span><span>${msg}</span>`;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(12px)';el.style.transition='all .2s';setTimeout(()=>el.remove(),220)},3000);
+}
+
+/*═══════════════════════════════════════════
+  CONFIRM
+═══════════════════════════════════════════*/
+function confirm2(title,msg,onOk,okLabel='Delete',danger=true){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmMsg').innerHTML=msg;
+  const btn=document.getElementById('confirmOk');
+  btn.textContent=okLabel;
+  btn.className='btn '+(danger?'btn-danger':'btn-primary');
+  btn.onclick=()=>{onOk();closeModal('confirmModal')};
+  openModal('confirmModal');
+}
+
+/*═══════════════════════════════════════════
+  LOAD ALL
+═══════════════════════════════════════════*/
+async function loadAll(){
+  await loadSalesFoods();
+  await loadSales();
+}
+
+/*═══════════════════════════════════════════
+  ── MENU ──
+═══════════════════════════════════════════*/
+async function loadMenuList(){
+  try{
+    const menu=await requestJson('/admin/menu');
+    const tbody=document.getElementById('menuListBody');
+    if(!menu.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty"><span class="empty-icon">🍛</span><p>No menu items yet.</p></div></td></tr>`;return;}
+    tbody.innerHTML=menu.map(r=>`
+      <tr>
+        <td class="td-main">${text(r.menu_item)}</td>
+        <td class="td-muted">${text(r.tamil_word)||'—'}</td>
+        <td class="td-muted">${text(r.category)||'—'}</td>
+        <td>₹${money(r.price)}</td>
+        <td><div class="row-acts">
+          <button class="row-btn edit" title="Edit" onclick='startEditMenu(${JSON.stringify(r)})'>✏️</button>
+          <button class="row-btn del"  title="Delete" onclick="deleteMenuItem(${r.id})">🗑</button>
+        </div></td>
+      </tr>`).join('');
+  }catch(e){toast(e.message,'err')}
+}
+
+function resetMenuForm(){
+  editingMenuId=null;
+  document.getElementById('menuModalTitle').textContent='Add Menu Item';
+  ['menuItem','tamilWord','category','menuPrice'].forEach(id=>document.getElementById(id).value='');
+  ['menuItemErr','menuPriceErr'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+function startEditMenu(row){
+  editingMenuId=row.id;
+  document.getElementById('menuModalTitle').textContent='Edit Menu Item';
+  document.getElementById('menuItem').value=text(row.menu_item);
+  document.getElementById('tamilWord').value=text(row.tamil_word);
+  document.getElementById('category').value=text(row.category);
+  document.getElementById('menuPrice').value=text(row.price);
+  closeModal('menuListModal');
+  openModal('menuModal');
+}
+
+async function saveMenuItem(){
+  const name=document.getElementById('menuItem').value.trim();
+  const price=document.getElementById('menuPrice').value;
+  let valid=true;
+  document.getElementById('menuItemErr').classList.toggle('show',!name); if(!name)valid=false;
+  document.getElementById('menuPriceErr').classList.toggle('show',!price); if(!price)valid=false;
+  if(!valid)return;
+  try{
+    const url=editingMenuId?`/admin/menu/${editingMenuId}`:'/admin/menu';
+    const method=editingMenuId?'PUT':'POST';
+    const data=await requestJson(url,{method,headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({menu_item:name,tamil_word:document.getElementById('tamilWord').value.trim(),
+        category:document.getElementById('category').value.trim(),price})});
+    toast(data.message||'Menu saved','ok');
+    closeModal('menuModal');
+    loadMenuList();
+    loadSalesFoods();
+  }catch(e){toast(e.message,'err')}
+}
+
+async function deleteMenuItem(id){
+  confirm2('Delete Menu Item?','This will move the item to the Recycle Bin.',async()=>{
+    try{
+      const d=await requestJson(`/admin/menu/${id}`,{method:'DELETE'});
+      toast(d.message||'Item moved to bin','ok');
+      loadMenuList();loadBin();updateBinBadge();
+    }catch(e){toast(e.message,'err')}
+  });
+}
+
+/*═══════════════════════════════════════════
+  ── ALIAS ──
+═══════════════════════════════════════════*/
+async function loadAliasMenuOptions(sel=''){
+  const menu=await requestJson('/admin/menu').catch(()=>[]);
+  const s=document.getElementById('aliasMenuId');
+  s.innerHTML='<option value="">Select food…</option>';
+  menu.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.menu_item;s.appendChild(o)});
+  if(sel)s.value=String(sel);
+}
+
+async function loadAliasList(){
+  try{
+    const aliases=await requestJson('/admin/aliases');
+    const tbody=document.getElementById('aliasListBody');
+    if(!aliases.length){tbody.innerHTML=`<tr><td colspan="3"><div class="empty"><span class="empty-icon">🏷️</span><p>No aliases yet.</p></div></td></tr>`;return;}
+    tbody.innerHTML=aliases.map(r=>`
+      <tr>
+        <td class="td-main">${text(r.menu_item)}</td>
+        <td><span class="alias-chip">${text(r.alias)}</span></td>
+        <td><div class="row-acts">
+          <button class="row-btn edit" title="Edit" onclick='startEditAlias(${JSON.stringify(r)})'>✏️</button>
+          <button class="row-btn del"  title="Delete" onclick="deleteAlias(${r.id})">🗑</button>
+        </div></td>
+      </tr>`).join('');
+  }catch(e){toast(e.message,'err')}
+}
+
+function resetAliasForm(){
+  editingAliasId=null;tags=[];
+  document.getElementById('aliasModalTitle').textContent='Add Food Alias';
+  document.getElementById('aliasMenuId').value='';
+  renderTags();document.getElementById('tagField').value='';
+  ['aliasFoodErr','aliasTagErr'].forEach(id=>document.getElementById(id).classList.remove('show'));
+}
+
+function startEditAlias(row){
+  editingAliasId=row.id;tags=[];
+  document.getElementById('aliasModalTitle').textContent='Edit Alias';
+  document.getElementById('aliasMenuId').value=String(row.menu_id);
+  addTag(text(row.alias));
+  closeModal('aliasListModal');
+  openModal('aliasModal');
+}
+
+async function saveAlias(){
+  // flush typed text
+  const inp=document.getElementById('tagField').value.trim();
+  if(inp){addTag(inp);document.getElementById('tagField').value='';}
+  const menuId=document.getElementById('aliasMenuId').value;
+  let valid=true;
+  document.getElementById('aliasFoodErr').classList.toggle('show',!menuId); if(!menuId)valid=false;
+  document.getElementById('aliasTagErr').classList.toggle('show',!tags.length); if(!tags.length)valid=false;
+  if(!valid)return;
+  try{
+    const url=editingAliasId?`/admin/aliases/${editingAliasId}`:'/admin/aliases';
+    const method=editingAliasId?'PUT':'POST';
+    const payload=editingAliasId?{menu_id:menuId,alias:tags[0]}:{menu_id:menuId,aliases:tags.join('\n')};
+    const d=await requestJson(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    toast(d.message||'Alias saved','ok');
+    closeModal('aliasModal');
+    loadAliasList();
+  }catch(e){toast(e.message,'err')}
+}
+
+async function deleteAlias(id){
+  confirm2('Delete Alias?','This will move the alias to the Recycle Bin.',async()=>{
+    try{
+      const d=await requestJson(`/admin/aliases/${id}`,{method:'DELETE'});
+      toast(d.message||'Alias moved to bin','ok');
+      loadAliasList();loadBin();updateBinBadge();
+    }catch(e){toast(e.message,'err')}
+  });
+}
+
+/*── TAG INPUT ──*/
+function addTag(v){
+  v=v.trim().toLowerCase();
+  if(!v||tags.includes(v)){if(tags.includes(v))toast(`"${v}" already added`,'info');return false;}
+  tags.push(v);renderTags();return true;
+}
+function removeTag(v){tags=tags.filter(t=>t!==v);renderTags();}
+function renderTags(){
+  document.getElementById('tagWrap').querySelectorAll('.tag-chip').forEach(c=>c.remove());
+  const field=document.getElementById('tagField');
+  tags.forEach(t=>{
+    const c=document.createElement('span');c.className='tag-chip';
+    c.innerHTML=`${t}<button class="tag-chip-x" onclick="removeTag('${t.replace(/'/g,"\\'")}')">&#x2715;</button>`;
+    document.getElementById('tagWrap').insertBefore(c,field);
+  });
+}
+function tagKey(e){
+  const inp=document.getElementById('tagField');
+  if(e.key==='Enter'||e.key===','){e.preventDefault();if(addTag(inp.value.replace(',','').trim()))inp.value='';}
+  else if(e.key==='Backspace'&&!inp.value&&tags.length)removeTag(tags[tags.length-1]);
+}
+function tagPaste(e){
+  e.preventDefault();
+  const txt=(e.clipboardData||window.clipboardData).getData('text');
+  txt.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).forEach(addTag);
+  document.getElementById('tagField').value='';
+}
+
+/*═══════════════════════════════════════════
+  ── BIN ──
+═══════════════════════════════════════════*/
+async function loadBin(){
+  try{
+    const bin=await requestJson('/admin/bin');
+    const total=(bin.menu_items||[]).length+(bin.food_aliases||[]).length;
+    updateBinBadge(total);
+
+    const mb=document.getElementById('binMenuBody');
+    mb.innerHTML=(bin.menu_items||[]).length
+      ? (bin.menu_items||[]).map(r=>`
+          <tr>
+            <td class="td-main">${text(r.menu_item)}</td>
+            <td class="td-muted">${text(r.category)||'—'}</td>
+            <td>₹${money(r.price)}</td>
+            <td><button class="row-btn restore" onclick="restoreMenuItem(${r.id})">↩ Restore</button></td>
+          </tr>`).join('')
+      : '<tr><td colspan="4"><div class="empty"><p>No deleted menu items.</p></div></td></tr>';
+
+    const ab=document.getElementById('binAliasBody');
+    ab.innerHTML=(bin.food_aliases||[]).length
+      ? (bin.food_aliases||[]).map(r=>`
+          <tr>
+            <td class="td-main">${text(r.menu_item)}</td>
+            <td><span class="alias-chip">${text(r.alias)}</span></td>
+            <td><button class="row-btn restore" onclick="restoreAlias(${r.id})">↩ Restore</button></td>
+          </tr>`).join('')
+      : '<tr><td colspan="3"><div class="empty"><p>No deleted aliases.</p></div></td></tr>';
+  }catch(e){toast(e.message,'err')}
+}
+
+function updateBinBadge(n){
+  const b=document.getElementById('binBadge');
+  if(n===undefined){requestJson('/admin/bin').then(bin=>{const t=(bin.menu_items||[]).length+(bin.food_aliases||[]).length;b.textContent=t;b.style.display=t?'':'none'}).catch(()=>{}); return;}
+  b.textContent=n;b.style.display=n?'':'none';
+}
+
+async function restoreMenuItem(id){
+  try{const d=await requestJson(`/admin/bin/menu/${id}/restore`,{method:'POST'});toast(d.message||'Restored','ok');loadBin();loadMenuList();}catch(e){toast(e.message,'err')}
+}
+async function restoreAlias(id){
+  try{const d=await requestJson(`/admin/bin/aliases/${id}/restore`,{method:'POST'});toast(d.message||'Restored','ok');loadBin();loadAliasList();}catch(e){toast(e.message,'err')}
+}
+
+/*═══════════════════════════════════════════
+  ── SALES ──
+═══════════════════════════════════════════*/
+async function loadSalesFoods(){
+  try{
+    const foods=await requestJson('/admin/sales/foods');
+    const sel=document.getElementById('foodFilter');
+    const cur=sel.value;
+    sel.innerHTML='<option value="">All Foods</option>';
+    foods.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o)});
+    sel.value=cur;
+  }catch(e){}
+}
+
+function salesQueryString(){
+  const p=new URLSearchParams();
+  const date=document.getElementById('filterDate').value.trim();
+  const s=document.getElementById('startDate').value.trim();
+  const e=document.getElementById('endDate').value.trim();
+  const food=document.getElementById('foodFilter').value.trim();
+  if(date)p.set('date',date);
+  if(s)p.set('start_date',s);
+  if(e)p.set('end_date',e);
+  if(food)p.set('food_name',food);
+  return p.toString();
+}
+
+/* ── FOOD FILTER IS INSTANT, DATE NEEDS BUTTON ── */
+async function loadSales(){
+  try{
+    const q=salesQueryString();
+    allSales=await requestJson(q?`/admin/sales?${q}`:'/admin/sales');
+    filteredSales=[...allSales];
+    salesPg=1;
+    updateSalesKPIs();
+    filterSalesTable(); // apply search box too
+  }catch(e){toast(e.message,'err')}
+}
+
+/* Button-triggered date filter */
+function applyDateFilter(){loadSales();}
+
+/* Instant in-table search (no API call) */
+function filterSalesTable(){
+  const q=document.getElementById('salesSearch').value.toLowerCase().trim();
+  filteredSales=q?allSales.filter(r=>
+    text(r.food_name).toLowerCase().includes(q)||
+    text(r.date).toLowerCase().includes(q)||
+    text(r.id).toLowerCase().includes(q)
+  ):[...allSales];
+  salesPg=1;
+  renderSalesTable();
+}
+
+function sortSales(key){
+  if(salesSort.k===key)salesSort.d*=-1;else{salesSort.k=key;salesSort.d=1;}
+  filteredSales.sort((a,b)=>{
+    const av=isNaN(a[key])?text(a[key]).toLowerCase():Number(a[key]);
+    const bv=isNaN(b[key])?text(b[key]).toLowerCase():Number(b[key]);
+    return(av<bv?-1:av>bv?1:0)*salesSort.d;
+  });
+  renderSalesTable();
+}
+
+function renderSalesTable(){
+  const tot=filteredSales.length;
+  const tpg=Math.max(1,Math.ceil(tot/SALES_PAGE));
+  if(salesPg>tpg)salesPg=tpg;
+  const rows=filteredSales.slice((salesPg-1)*SALES_PAGE,salesPg*SALES_PAGE);
+
+  const tb=document.getElementById('salesBody');
+  if(!rows.length){
+    tb.innerHTML=`<tr><td colspan="6"><div class="empty"><span class="empty-icon">🧾</span><p>No sales records match your filter.</p></div></td></tr>`;
+  }else{
+    let qtot=0,atot=0;
+    tb.innerHTML=rows.map(r=>{qtot+=Number(r.quantity||0);atot+=Number(r.total||0);return`
+      <tr>
+        <td class="td-mono">${text(r.id)}</td>
+        <td class="td-muted">${text(r.date)}</td>
+        <td class="td-main">${text(r.food_name)}</td>
+        <td><span class="pill pill-blue">${text(r.quantity)}</span></td>
+        <td>₹${money(r.price)}</td>
+        <td style="font-weight:700">₹${money(r.total)}</td>
+      </tr>`;}).join('');
+  }
+
+  // summaries
+  let qtyTotal=0,amtTotal=0;
+  filteredSales.forEach(r=>{qtyTotal+=Number(r.quantity||0);amtTotal+=Number(r.total||0)});
+  document.getElementById('salesRows').textContent=tot;
+  document.getElementById('salesQty').textContent=qtyTotal;
+  document.getElementById('salesTotal').textContent='₹'+money(amtTotal);
+  document.getElementById('salesRowInfo').textContent=`${tot} record${tot!==1?'s':''}`;
+
+  // pagination
+  const pi=document.getElementById('salesPgInfo');
+  const start=(salesPg-1)*SALES_PAGE;
+  pi.textContent=tot?`Showing ${start+1}–${Math.min(start+SALES_PAGE,tot)} of ${tot}`:' 0 records';
+  const pb=document.getElementById('salesPg');
+  let h='';
+  if(salesPg>1)h+=`<button class="pg-btn" onclick="goPg(${salesPg-1})">‹</button>`;
+  for(let i=Math.max(1,salesPg-2);i<=Math.min(tpg,salesPg+2);i++)
+    h+=`<button class="pg-btn${i===salesPg?' cur':''}" onclick="goPg(${i})">${i}</button>`;
+  if(salesPg<tpg)h+=`<button class="pg-btn" onclick="goPg(${salesPg+1})">›</button>`;
+  pb.innerHTML=h;
+}
+
+function goPg(p){salesPg=p;renderSalesTable()}
+
+function updateSalesKPIs(){
+  let rev=0,qty=0;const map={};
+  allSales.forEach(r=>{
+    rev+=Number(r.total||0);qty+=Number(r.quantity||0);
+    map[r.food_name]=(map[r.food_name]||0)+Number(r.quantity||0);
+  });
+  document.getElementById('kpiRev').textContent='₹'+money(rev);
+  document.getElementById('kpiOrders').textContent=allSales.length;
+  document.getElementById('kpiQty').textContent=qty;
+  const top=Object.entries(map).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpiTop').textContent=top?top[0]:'—';
+}
+
+function clearSalesFilters(){
+  ['filterDate','startDate','endDate'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('foodFilter').value='';
+  document.getElementById('salesSearch').value='';
+  document.querySelectorAll('.qd-btn').forEach(b=>b.classList.remove('active'));
+  loadSales();
+}
+
+function downloadSalesPdf(){
+  const q=salesQueryString();
+  window.location.href=q?`/admin/sales/pdf?${q}`:'/admin/sales/pdf';
+}
+
+/*── QUICK DATE ──*/
+function quickDate(range, btn){
+  document.querySelectorAll('.qd-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // Clear date fields first
+  document.getElementById('filterDate').value='';
+  document.getElementById('startDate').value='';
+  document.getElementById('endDate').value='';
+
+  const today=new Date();
+  const fmt=d=>`${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+
+  if(range==='today'){
+    document.getElementById('filterDate').value=fmt(today);
+  }else if(range==='yesterday'){
+    const y=new Date(today);y.setDate(y.getDate()-1);
+    document.getElementById('filterDate').value=fmt(y);
+  }else if(range==='week'){
+    const s=new Date(today);s.setDate(s.getDate()-s.getDay());
+    document.getElementById('startDate').value=fmt(s);
+    document.getElementById('endDate').value=fmt(today);
+  }else if(range==='month'){
+    const s=new Date(today.getFullYear(),today.getMonth(),1);
+    document.getElementById('startDate').value=fmt(s);
+    document.getElementById('endDate').value=fmt(today);
+  }
+  // All = no filter
+  if(range!=='all') loadSales();
+  else clearSalesFilters();
+}
+
+/*═══════════════════════════════════════════
+  KEYBOARD SHORTCUTS
+═══════════════════════════════════════════*/
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open'));
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('salesSearch').focus();}
+  if(e.key==='r'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='SELECT'){
+    loadAll();
+  }
+});
+
+/*═══════════════════════════════════════════
+  RESPONSIVE
+═══════════════════════════════════════════*/
+function checkMobile(){
+  const mob=window.innerWidth<=900;
+  document.getElementById('mobToggle').style.display=mob?'flex':'none';
+}
+window.addEventListener('resize',checkMobile);
+checkMobile();
+
+/*═══════════════════════════════════════════
+  BOOT
+═══════════════════════════════════════════*/
+loadAll().catch(e=>toast(e.message,'err'));
+updateBinBadge();
+</script>
+</body>
+</html>

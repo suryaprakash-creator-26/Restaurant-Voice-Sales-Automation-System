@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+audio/
+converted_audio.wav
+voice.ogg
+sales.xlsx
+s.xlsx
+restaurant.db
+.env
+ngrok.exe
+venv/

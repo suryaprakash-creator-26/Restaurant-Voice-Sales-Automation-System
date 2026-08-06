@@ -1,0 +1,152 @@
+[
+    {
+        "menu_item": "IDLI",
+        "tamil_word": "இட்லி",
+        "category": "breakfast",
+        "price": 30
+    },
+    {
+        "menu_item": "DOSA",
+        "tamil_word": "தோசை",
+        "category": "breakfast",
+        "price": 40
+    },
+    {
+        "menu_item": "PONGAL",
+        "tamil_word": "பொங்கல்",
+        "category": "breakfast",
+        "price": 35
+    },
+    {
+        "menu_item": "VADA",
+        "tamil_word": "வடை",
+        "category": "breakfast",
+        "price": 25
+    },
+    {
+        "menu_item": "UPMA",
+        "tamil_word": "உப்புமா",
+        "category": "breakfast",
+        "price": 30
+    },
+    {
+        "menu_item": "CHAPATI",
+        "tamil_word": "சப்பாத்தி",
+        "category": "breakfast",
+        "price": 15
+    },
+    {
+        "menu_item": "STEAMED RICE",
+        "tamil_word": "சாதம்",
+        "category": "lunch",
+        "price": 60
+    },
+    {
+        "menu_item": "SAMBAR RICE",
+        "tamil_word": "சாம்பார் சாதம்",
+        "category": "lunch",
+        "price": 20
+    },
+    {
+        "menu_item": "RASAM",
+        "tamil_word": "ரசம்",
+        "category": "lunch",
+        "price": 15
+    },
+    {
+        "menu_item": "CHICKEN BIRYANI",
+        "tamil_word": "சிக்கன் பிரியாணி",
+        "category": "lunch",
+        "price": 120
+    },
+    {
+        "menu_item": "KOOTU CURRY",
+        "tamil_word": "கூட்டு",
+        "category": "lunch",
+        "price": 25
+    },
+    {
+        "menu_item": "PAPAD",
+        "tamil_word": "அப்பளம்",
+        "category": "lunch",
+        "price": 10
+    },
+    {
+        "menu_item": "GRILL CHICKEN",
+        "tamil_word": "கிரில் சிக்கென்",
+        "category": "lunch",
+        "price": 300
+    },
+    {
+        "menu_item": "FILTER COFFEE",
+        "tamil_word": "காபி",
+        "category": "beverages",
+        "price": 20
+    },
+    {
+        "menu_item": "MASALA TEA",
+        "tamil_word": "மசாலா தேநீர்",
+        "category": "beverages",
+        "price": 15
+    },
+    {
+        "menu_item": "BUTTERMILK",
+        "tamil_word": "மோர்",
+        "category": "beverages",
+        "price": 20
+    },
+    {
+        "menu_item": "MANGO LASSI",
+        "tamil_word": "மாம்பழ லஸ்ஸி",
+        "category": "beverages",
+        "price": 40
+    },
+    {
+        "menu_item": "SPICED BUTTERMILK",
+        "tamil_word": "நீர் மோர்",
+        "category": "beverages",
+        "price": 15
+    },
+    {
+        "menu_item": "FRESH LIME JUICE",
+        "tamil_word": "எலுமிச்சை ஜூஸ்",
+        "category": "beverages",
+        "price": 50
+    },
+    {
+        "menu_item": "DINNER RICE PLATE",
+        "tamil_word": "இரவு சாப்பாடு",
+        "category": "dinner",
+        "price": 70
+    },
+    {
+        "menu_item": "CHAPATI SET",
+        "tamil_word": "சப்பாத்தி செட்",
+        "category": "dinner",
+        "price": 60
+    },
+    {
+        "menu_item": "PAROTTA",
+        "tamil_word": "பரோட்டா",
+        "category": "dinner",
+        "price": 20
+    },
+    {
+        "menu_item": "VEG KURUMA",
+        "tamil_word": "வெஜ் குருமா",
+        "category": "dinner",
+        "price": 50
+    },
+    {
+        "menu_item": "VEG PULAO",
+        "tamil_word": "வெஜ் புலாவ்",
+        "category": "dinner",
+        "price": 90
+    },
+    {
+        "menu_item": "FRIED NOODLES",
+        "tamil_word": "நூடுல்ஸ்",
+        "category": "dinner",
+        "price": 80
+    }
+]

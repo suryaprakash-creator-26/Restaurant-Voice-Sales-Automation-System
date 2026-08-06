@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Sales Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .good { color: #22c55e; }
+        .bad { color: #ef4444; }
+        .warn { color: #f59e0b; }
+    </style>
+</head>
+
+<body>
+
+<h1>🎤 Voice Sales Dashboard</h1>
+
+<div class="card">
+    <h3>Voice Input</h3>
+    <p id="text">Loading...</p>
+</div>
+
+<div class="card">
+    <h3>Matched Foods</h3>
+    <p id="matched"></p>
+</div>
+
+<div class="card">
+    <h3>Unknown Foods</h3>
+    <p id="unknown" class="bad"></p>
+</div>
+
+<div class="card">
+    <h3>Review Queue</h3>
+    <div id="reviews"></div>
+</div>
+
+<div class="card">
+    <h3>Total</h3>
+    <h2 id="total"></h2>
+</div>
+
+<script>
+async function loadData() {
+
+    const res = await fetch("/dashboard-data");
+    const data = await res.json();
+
+    document.getElementById("text").innerText =
+        data.text || "";
+
+    document.getElementById("matched").innerText =
+        JSON.stringify(data.matched || []);
+
+    document.getElementById("unknown").innerText =
+        JSON.stringify(data.unknown || []);
+
+    document.getElementById("total").innerText =
+        "₹ " + (data.total || 0);
+
+    document.getElementById("reviews").innerHTML =
+        (data.reviews || []).map(r => `
+            <div style="
+                margin-bottom:10px;
+                padding:10px;
+                border:1px solid #334155;
+                border-radius:8px;
+            ">
+                <b>${r.spoken_text}</b><br>
+                Suggested: ${r.suggested_food}<br>
+                Score: ${r.score}<br>
+                Qty: ${r.quantity}
+            </div>
+        `).join("");
+}
+
+setInterval(loadData, 2000);
+</script>
+
+</body>
+</html>

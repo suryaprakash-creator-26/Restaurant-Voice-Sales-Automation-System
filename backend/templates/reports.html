@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sales Intelligence Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reports.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <header>
+
+            <div>
+                <h1>Sales Intelligence Dashboard</h1>
+                <p>Restaurant Business Analytics</p>
+            </div>
+
+            <a href="/" class="back-btn">
+                Back Dashboard
+            </a>
+
+        </header>
+
+        <!-- KPI CARDS -->
+
+        <section class="cards">
+
+            <div class="card">
+                <h4>Total Revenue</h4>
+                <h2 id="revenueCard">₹0</h2>
+            </div>
+
+            <div class="card">
+                <h4>Top Food</h4>
+                <h2 id="topFoodCard">-</h2>
+            </div>
+
+            <div class="card">
+                <h4>Total Units Sold</h4>
+                <h2 id="unitsCard">0</h2>
+            </div>
+
+            <div class="card">
+                <h4>Average Daily Sales</h4>
+                <h2 id="avgCard">₹0</h2>
+            </div>
+
+           
+
+            <div class="card">
+                <h4>Active Foods</h4>
+                <h2 id="activeCard">0</h2>
+            </div>
+
+        </section>
+
+        <!-- CHARTS -->
+
+        <section class="charts">
+
+            <div class="chart-box">
+
+                <h3>Revenue Trend</h3>
+
+                <canvas id="salesChart"></canvas>
+
+            </div>
+
+            <div class="chart-box">
+
+                <h3>Food Distribution</h3>
+
+                <canvas id="foodChart"></canvas>
+
+            </div>
+
+        </section>
+
+        <!-- TABLES -->
+
+        <section class="tables">
+
+            <div class="table-box">
+
+                <h3>Top 5 Foods</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Food Name</th>
+                            <th>Sales Qty</th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody id="topFoodsTable">
+                    </tbody>
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- NO SALES FOODS -->
+
+        <section class="no-sales-section">
+
+            <div class="section-header">
+                <h2>No Sales Foods</h2>
+                <p>Foods with zero sales during this period</p>
+            </div>
+
+            <div id="noSalesFoods"></div>
+
+        </section>
+
+        <!-- LOW SALES FOODS -->
+
+        <section class="low-sales-section">
+
+            <div class="section-header">
+                <h2>Low Sales Foods</h2>
+                <p>Foods requiring attention</p>
+            </div>
+
+            <div id="lowSalesFoods"></div>
+
+        </section>
+
+        <!-- BUSINESS INSIGHTS -->
+
+        <section class="insights-section">
+
+            <div class="insights-header">
+                <h2>Actionable Business Insights</h2>
+            </div>
+
+            <div id="insights"></div>
+
+        </section>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Results Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+
+        /* ── THEME VARIABLES ── */
+        body.theme-green {
+            --bg-page:       #FBF6F0;
+            --bg-topbar:     #2C3E35;
+            --bg-hero:       #2C3E35;
+            --hero-title:    #ffffff;
+            --hero-eyebrow:  #A8D4B8;
+            --hero-time:     #8EC9A4;
+            --kpi-bg:        rgba(255,255,255,0.10);
+            --kpi-label:     #A8D4B8;
+            --kpi-sub:       #D4E8DC;
+            --brand-color:   #D4E8DC;
+            --nav-link:      #8FB8A0;
+            --nav-link-hover:#D4E8DC;
+            --back-btn-bg:   #4A7C61;
+            --back-btn-text: #F0FAF4;
+            --toggle-bg:     #3d5c4a;
+            --toggle-text:   #D4E8DC;
+            --card-bg:       #ffffff;
+            --card-border:   #D5E8DC;
+            --label-color:   #4A7C61;
+            --text-main:     #1C2E26;
+            --voice-box-bg:  #F4FAF6;
+            --voice-box-border:#D5E8DC;
+            --voice-accent:  #4A7C61;
+            --th-bg:         #F0F8F3;
+            --th-color:      #4A7C61;
+            --td-border:     #EBF5EF;
+            --td-hover:      #F4FAF6;
+            --tfoot-bg:      #F0F8F3;
+            --tfoot-border:  #D5E8DC;
+            --qty-bg:        #EBF5EF;
+            --qty-border:    #D5E8DC;
+            --qty-color:     #2C6647;
+            --rev-color:     #2C6647;
+            --total-color:   #2C6647;
+            --table-head-bg: #2C3E35;
+            --table-head-title:#D4E8DC;
+            --table-head-badge:#A8D4B8;
+            --action-card-bg:#2C3E35;
+            --action-title:  #D4E8DC;
+            --action-sub:    #8FB8A0;
+            --action-btn-bg: #4A7C61;
+            --tl-dot:        #4A7C61;
+            --tl-line:       #D5E8DC;
+            --tl-title:      #4A7C61;
+            --info-label:    #4A7C61;
+            --status-bg:     #EAFAF3;
+            --status-color:  #1A6B42;
+            --status-border: #B5E5CC;
+            --status-dot:    #22A05A;
+        }
+
+        body.theme-warm {
+            --bg-page:       #FBF6F0;
+            --bg-topbar:     #3B1A0A;
+            --bg-hero:       #3B1A0A;
+            --hero-title:    #ffffff;
+            --hero-eyebrow:  #F5C4A0;
+            --hero-time:     #F5C4A0;
+            --kpi-bg:        rgba(255,255,255,0.10);
+            --kpi-label:     #F5C4A0;
+            --kpi-sub:       #FBDFC8;
+            --brand-color:   #F5DEC8;
+            --nav-link:      #C49C7A;
+            --nav-link-hover:#F5DEC8;
+            --back-btn-bg:   #C1622A;
+            --back-btn-text: #FFF8F3;
+            --toggle-bg:     #5a2e12;
+            --toggle-text:   #F5DEC8;
+            --card-bg:       #ffffff;
+            --card-border:   #EDD9C8;
+            --label-color:   #C1622A;
+            --text-main:     #3B1A0A;
+            --voice-box-bg:  #FFF8F3;
+            --voice-box-border:#EDD9C8;
+            --voice-accent:  #C1622A;
+            --th-bg:         #FBF0E8;
+            --th-color:      #C1622A;
+            --td-border:     #F5EAE0;
+            --td-hover:      #FFF8F3;
+            --tfoot-bg:      #FBF0E8;
+            --tfoot-border:  #EDD9C8;
+            --qty-bg:        #FBF0E8;
+            --qty-border:    #EDD9C8;
+            --qty-color:     #7B3A22;
+            --rev-color:     #C1622A;
+            --total-color:   #C1622A;
+            --table-head-bg: #3B1A0A;
+            --table-head-title:#F5DEC8;
+            --table-head-badge:#F5C4A0;
+            --action-card-bg:#3B1A0A;
+            --action-title:  #F5DEC8;
+            --action-sub:    #C49C7A;
+            --action-btn-bg: #C1622A;
+            --tl-dot:        #C1622A;
+            --tl-line:       #EDD9C8;
+            --tl-title:      #C1622A;
+            --info-label:    #C1622A;
+            --status-bg:     #EAFAF3;
+            --status-color:  #1A6B42;
+            --status-border: #B5E5CC;
+            --status-dot:    #22A05A;
+        }
+
+        body {
+            font-family: 'DM Sans', Arial, sans-serif;
+            background: var(--bg-page);
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--bg-topbar);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.3s;
+        }
+        .brand {
+            font-family: 'Playfair Display', serif;
+            color: var(--brand-color);
+            font-size: 20px;
+            letter-spacing: -0.3px;
+        }
+        .topnav { display: flex; gap: 24px; align-items: center; }
+        .topnav a { color: var(--nav-link); font-size: 13px; text-decoration: none; transition: color 0.2s; }
+        .topnav a:hover { color: var(--nav-link-hover); }
+        .back-btn {
+            background: var(--back-btn-bg);
+            color: var(--back-btn-text);
+            border: none;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', Arial, sans-serif;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        /* ── TOGGLE BUTTON ── */
+        .toggle-btn {
+            background: var(--toggle-bg);
+            color: var(--toggle-text);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            transition: background 0.3s, color 0.3s;
+            white-space: nowrap;
+        }
+        .toggle-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        .nav-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
+
+        /* ── HERO BAND ── */
+        .hero-band {
+            background: var(--bg-hero);
+            padding: 28px 28px 0;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        .hero-band::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 32px;
+            background: var(--bg-page);
+            border-radius: 50% 50% 0 0 / 32px 32px 0 0;
+        }
+        .hero-eyebrow {
+            color: var(--hero-eyebrow);
+            font-size: 12px; font-weight: 500;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--hero-title);
+            font-size: 28px; font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .hero-time {
+            color: var(--hero-time);
+            font-size: 13px; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-bottom: 44px;
+        }
+        .kpi {
+            background: var(--kpi-bg);
+            border-radius: 14px; padding: 16px 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .kpi-label {
+            color: var(--kpi-label);
+            font-size: 11px; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+        .kpi-val {
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-size: 26px; font-weight: 700; line-height: 1;
+        }
+        .kpi-sub { color: var(--kpi-sub); font-size: 11px; margin-top: 4px; }
+
+        /* ── BODY ── */
+        .page-body { padding: 20px 28px 32px; max-width: 1200px; margin: auto; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 20px;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .card-label {
+            font-size: 11px; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--label-color);
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .voice-box {
+            background: var(--voice-box-bg);
+            border: 1px solid var(--voice-box-border);
+            border-left: 3px solid var(--voice-accent);
+            border-radius: 0 12px 12px 0;
+            padding: 14px 16px;
+            font-size: 14px; color: var(--text-main); line-height: 1.7;
+            transition: all 0.3s;
+        }
+        .info-table td { padding: 5px 0; font-size: 13px; }
+        .info-table td:first-child { color: var(--info-label); width: 90px; }
+        .info-table td:last-child { color: var(--text-main); font-weight: 500; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--status-bg); color: var(--status-color);
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 500;
+            border: 1px solid var(--status-border);
+        }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-dot); }
+
+        /* ── MATCHED FOODS TABLE ── */
+        .table-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px; overflow: hidden;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .table-head {
+            background: var(--table-head-bg);
+            padding: 16px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: background 0.3s;
+        }
+        .table-head-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--table-head-title);
+            font-size: 17px; font-weight: 600;
+        }
+        .table-head-badge {
+            background: rgba(255,255,255,0.12);
+            color: var(--table-head-badge);
+            font-size: 12px; padding: 3px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        thead th {
+            background: var(--th-bg);
+            font-size: 11px; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.7px;
+            color: var(--th-color);
+            padding: 11px 20px; text-align: left;
+            border-bottom: 1px solid var(--card-border);
+            transition: background 0.3s, color 0.3s;
+        }
+        thead th:nth-child(2), tbody td:nth-child(2) { text-align: center; }
+        thead th:nth-child(3), tbody td:nth-child(3) { text-align: right; }
+        tbody tr { border-bottom: 1px solid var(--td-border); transition: background 0.1s; }
+        tbody tr:hover { background: var(--td-hover); }
+        tbody tr:last-child { border-bottom: none; }
+        tbody td { padding: 14px 20px; font-size: 14px; color: var(--text-main); }
+        .item-name { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+        .qty-chip {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--qty-bg); color: var(--qty-color);
+            font-size: 13px; font-weight: 600;
+            padding: 3px 14px; border-radius: 20px;
+            border: 1px solid var(--qty-border); min-width: 48px;
+            transition: all 0.3s;
+        }
+        .rev { font-weight: 600; color: var(--rev-color); font-size: 15px; transition: color 0.3s; }
+        tfoot tr { background: var(--tfoot-bg); }
+        tfoot td {
+            padding: 14px 20px; font-weight: 600;
+            font-size: 14px; color: var(--text-main);
+            border-top: 2px solid var(--tfoot-border);
+            transition: all 0.3s;
+        }
+
+        /* ── BOTTOM ROW ── */
+        .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .action-card {
+            background: var(--action-card-bg);
+            border-radius: 16px; padding: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+            transition: background 0.3s;
+        }
+        .action-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--action-title); font-size: 15px; font-weight: 600;
+        }
+        .action-sub { color: var(--action-sub); font-size: 13px; line-height: 1.5; }
+        .action-btn {
+            background: var(--action-btn-bg); color: #fff;
+            border: none; padding: 9px 18px;
+            border-radius: 20px; font-size: 13px; font-weight: 500;
+            cursor: pointer; font-family: 'DM Sans', Arial, sans-serif;
+            display: inline-flex; align-items: center; gap: 6px;
+            width: fit-content; transition: background 0.3s;
+        }
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 20px;
+            transition: all 0.3s;
+        }
+        .tl-title {
+            font-size: 13px; font-weight: 500;
+            color: var(--tl-title); text-transform: uppercase;
+            letter-spacing: 0.7px; margin-bottom: 14px;
+        }
+        .tl-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+        .tl-row:last-child { margin-bottom: 0; }
+        .tl-dot-wrap { display: flex; flex-direction: column; align-items: center; }
+        .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tl-dot); margin-top: 4px; flex-shrink: 0; transition: background 0.3s; }
+        .tl-line { width: 2px; background: var(--tl-line); flex: 1; min-height: 20px; margin: 2px 0; transition: background 0.3s; }
+        .tl-text { font-size: 13px; color: var(--text-main); font-weight: 500; }
+        .tl-sub { font-size: 12px; color: var(--tl-title); margin-top: 2px; }
+    </style>
+</head>
+<body class="theme-green">
+
+<div class="topbar">
+    <div class="brand">Crème</div>
+    <div class="topnav">
+        
+        <div class="nav-right">
+            <a href="/" class="back-btn">← Back to Home</a>
+            <button class="toggle-btn" onclick="toggleTheme()" id="toggleBtn">
+                <span class="toggle-dot" id="toggleDot" style="background:#C1622A"></span>
+                Switch to Warm
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="hero-band">
+    <div class="hero-eyebrow">🎤 Voice order · #VO-2026-0609</div>
+    <div class="hero-title">Voice Processing Result</div>
+    <div class="hero-time" id="hero-time-display">⏱ Loading...</div>
+    <div class="kpi-row">
+        <div class="kpi">
+            <div class="kpi-label">Total items</div>
+            <div class="kpi-val" id="kpi-items">—</div>
+            <div class="kpi-sub">food items matched</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-label">Total qty</div>
+            <div class="kpi-val" id="kpi-qty">—</div>
+            <div class="kpi-sub">units ordered</div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-label">Revenue</div>
+            <div class="kpi-val" id="kpi-revenue">₹0</div>
+            <div class="kpi-sub">from this order</div>
+        </div>
+    </div>
+</div>
+
+<div class="page-body">
+
+    <div class="two-col">
+        <div class="card">
+            <div class="card-label">Voice input</div>
+            <div class="voice-box" id="voice_text">Loading...</div>
+        </div>
+        <div class="card">
+            <div class="card-label" style="margin-bottom:12px">Order info</div>
+            <table class="info-table" style="font-size:13px;width:100%;table-layout:auto;border-collapse:collapse">
+                <tr>
+                    <td style="color:var(--info-label);padding:5px 0;width:90px">Created</td>
+                    <td style="color:var(--text-main);font-weight:500;padding:5px 0" id="created_at">Loading...</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--info-label);padding:5px 0">Language</td>
+                    <td style="color:var(--text-main);font-weight:500;padding:5px 0">Tamil</td>
+                </tr>
+                <tr>
+                    <td style="color:var(--info-label);padding:5px 0">Status</td>
+                    <td style="padding:5px 0">
+                        <div class="status-pill"><div class="status-dot"></div><span id="status">Loading...</span></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-head">
+            <div class="table-head-title">Matched Foods</div>
+            <div class="table-head-badge" id="table-badge">0 items · ₹0 total</div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:50%">Food item</th>
+                    <th style="width:25%">Quantity</th>
+                    <th style="width:25%">Revenue</th>
+                </tr>
+            </thead>
+            <tbody id="food_table"></tbody>
+            <tfoot>
+                <tr>
+                    <td style="font-weight:600;color:var(--text-main)">Total</td>
+                    <td style="text-align:center;font-weight:600;color:var(--qty-color)" id="total-qty">—</td>
+                    <td style="text-align:right;font-weight:700;color:var(--total-color);font-size:16px" id="total">₹0</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="bottom-row">
+        <div class="action-card">
+            <div class="action-title">Process another order</div>
+            <div class="action-sub">Record a new voice order or enter manually from the kitchen counter.</div>
+            <button class="action-btn">🎤 New voice order</button>
+        </div>
+        <div class="timeline-card">
+            <div class="tl-title">Order timeline</div>
+            <div class="tl-row">
+                <div class="tl-dot-wrap"><div class="tl-dot"></div><div class="tl-line"></div></div>
+                <div><div class="tl-text">Voice captured</div><div class="tl-sub" id="tl-captured">—</div></div>
+            </div>
+            <div class="tl-row">
+                <div class="tl-dot-wrap"><div class="tl-dot"></div><div class="tl-line"></div></div>
+                <div><div class="tl-text">Items matched</div><div class="tl-sub" id="tl-matched">—</div></div>
+            </div>
+            <div class="tl-row">
+                <div class="tl-dot-wrap"><div class="tl-dot" style="background:#22A05A"></div></div>
+                <div><div class="tl-text" style="color:#1A6B42">Order completed</div><div class="tl-sub" id="tl-completed">—</div></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentTheme = 'green';
+
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('toggleBtn');
+        const dot = document.getElementById('toggleDot');
+        if (currentTheme === 'green') {
+            body.classList.remove('theme-green');
+            body.classList.add('theme-warm');
+            dot.style.background = '#4A7C61';
+            btn.textContent = '';
+            btn.prepend(dot);
+            btn.appendChild(document.createTextNode(' Switch to Green'));
+            currentTheme = 'warm';
+        } else {
+            body.classList.remove('theme-warm');
+            body.classList.add('theme-green');
+            dot.style.background = '#C1622A';
+            btn.textContent = '';
+            btn.prepend(dot);
+            btn.appendChild(document.createTextNode(' Switch to Warm'));
+            currentTheme = 'green';
+        }
+    }
+
+    async function loadVoiceResult() {
+        try {
+            const response = await fetch("/voice-results-data");
+            const data = await response.json();
+
+            console.log(data);
+
+            document.getElementById("voice_text").innerText = data.voice_text || "-";
+            document.getElementById("created_at").innerText = data.created_at || "-";
+            document.getElementById("status").innerText = data.status || "-";
+            document.getElementById("total").innerText = "₹" + (data.total || 0);
+
+            const heroTime = document.getElementById("hero-time-display");
+            heroTime.innerText = "⏱ " + (data.created_at || "-");
+
+            const tl = data.created_at || "";
+            document.getElementById("tl-captured").innerText = tl;
+            document.getElementById("tl-matched").innerText = tl;
+            document.getElementById("tl-completed").innerText = tl;
+
+            const table = document.getElementById("food_table");
+            table.innerHTML = "";
+
+            let totalQty = 0;
+            let totalRev = 0;
+            let itemCount = 0;
+
+            if (data.matched_foods) {
+                data.matched_foods.forEach(item => {
+                    totalQty += parseInt(item.qty) || 0;
+                    totalRev += parseInt(item.revenue) || 0;
+                    itemCount++;
+                    table.innerHTML += `
+                        <tr>
+                            <td><div class="item-name">${item.food}</div></td>
+                            <td><span class="qty-chip">× ${item.qty}</span></td>
+                            <td><span class="rev">₹${item.revenue}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById("kpi-items").innerText = itemCount || "—";
+            document.getElementById("kpi-qty").innerText = totalQty || "—";
+            document.getElementById("kpi-revenue").innerText = "₹" + (data.total || totalRev || 0);
+            document.getElementById("total-qty").innerText = totalQty ? totalQty + " units" : "—";
+            document.getElementById("table-badge").innerText = itemCount + " items · ₹" + (data.total || totalRev || 0) + " total";
+
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    loadVoiceResult();
+    setInterval(loadVoiceResult, 3000);
+</script>
+
+</body>
+</html>

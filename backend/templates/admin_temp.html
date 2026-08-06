@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #111827;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0 30px;
+            font-size: 34px;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            font-size: 24px;
+        }
+
+        h3 {
+            margin: 18px 0 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(320px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+        }
+
+        .scroll {
+            width: 100%;
+            overflow-x: auto;
+            max-height: 560px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        th,
+        td {
+            padding: 9px 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #0b7ff3;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            min-height: 88px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .alias-form-grid {
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) minmax(220px, 2fr);
+            gap: 12px;
+            align-items: start;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(150px, 1fr));
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 14px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: #0b7ff3;
+            color: white;
+        }
+
+        .btn-success {
+            background: #22a447;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-muted {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 7px 9px;
+            font-size: 12px;
+        }
+
+        .message {
+            min-height: 22px;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .ok {
+            color: #15803d;
+        }
+
+        .bad {
+            color: #b91c1c;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 12px 0 0;
+        }
+
+        .summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .summary-box strong {
+            display: block;
+            font-size: 22px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid,
+            .filter-grid,
+            .alias-form-grid {
+                grid-template-columns: repeat(2, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .form-grid,
+            .filter-grid,
+            .alias-form-grid,
+            .summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Voice Sales Admin Dashboard</h1>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Menu Items</h2>
+            <div class="scroll">
+                <table id="menuTable"></table>
+            </div>
+
+            <h3 id="menuFormTitle">Add Menu Item</h3>
+            <div class="form-grid">
+                <div>
+                    <label for="menuItem">Food Name</label>
+                    <input type="text" id="menuItem" placeholder="IDLI">
+                </div>
+                <div>
+                    <label for="tamilWord">Tamil Word</label>
+                    <input type="text" id="tamilWord" placeholder="Optional">
+                </div>
+                <div>
+                    <label for="category">Category</label>
+                    <input type="text" id="category" placeholder="Breakfast">
+                </div>
+                <div>
+                    <label for="menuPrice">Price</label>
+                    <input type="number" id="menuPrice" placeholder="30">
+                </div>
+            </div>
+            <div class="btn-row" style="margin-top: 12px;">
+                <button class="btn-success" onclick="saveMenuItem()">Save Menu Item</button>
+                <button class="btn-muted" onclick="resetMenuForm()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Food Aliases</h2>
+            <div class="scroll">
+                <table id="aliasTable"></table>
+            </div>
+
+            <h3 id="aliasFormTitle">Add Alias</h3>
+            <div class="alias-form-grid">
+                <div>
+                    <label for="aliasMenuId">Food Name</label>
+                    <select id="aliasMenuId">
+                        <option value="">Select Food</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="aliasText">Alias</label>
+                    <textarea id="aliasText" placeholder="idly, idliii&#10;itleeee"></textarea>
+                </div>
+            </div>
+            <div class="btn-row" style="margin-top: 12px;">
+                <button class="btn-success" onclick="saveAlias()">Save Alias</button>
+                <button class="btn-muted" onclick="resetAliasForm()">Clear</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Bin</h2>
+            <h3>Deleted Menu Items</h3>
+            <div class="scroll" style="max-height: 250px;">
+                <table id="binMenuTable"></table>
+            </div>
+
+            <h3>Deleted Aliases</h3>
+            <div class="scroll" style="max-height: 250px;">
+                <table id="binAliasTable"></table>
+            </div>
+        </div>
+
+        <div class="card wide">
+            <h2>Sales Data</h2>
+
+            <div class="filter-grid">
+                <div>
+                    <label for="filterDate">Exact Date</label>
+                    <input type="text" id="filterDate" placeholder="30-06-2026">
+                </div>
+                <div>
+                    <label for="startDate">Start Date</label>
+                    <input type="text" id="startDate" placeholder="28-06-2026">
+                </div>
+                <div>
+                    <label for="endDate">End Date</label>
+                    <input type="text" id="endDate" placeholder="30-06-2026">
+                </div>
+                <div>
+                    <label for="foodFilter">Food</label>
+                    <select id="foodFilter">
+                        <option value="">All Foods</option>
+                    </select>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-primary" onclick="loadSales()">Filter</button>
+                    <button class="btn-muted" onclick="clearSalesFilters()">Clear</button>
+                    <button class="btn-success" onclick="downloadSalesPdf()">PDF</button>
+                </div>
+            </div>
+
+            <div class="scroll">
+                <table id="salesTable"></table>
+            </div>
+
+            <div class="summary">
+                <div class="summary-box">
+                    Rows
+                    <strong id="salesRows">0</strong>
+                </div>
+                <div class="summary-box">
+                    Total Quantity
+                    <strong id="salesQty">0</strong>
+                </div>
+                <div class="summary-box">
+                    Total Amount
+                    <strong id="salesTotal">0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="msg" class="message"></div>
+
+    <script>
+        let editingMenuId = null;
+        let editingAliasId = null;
+
+        function text(value) {
+            return value === null || value === undefined ? "" : String(value);
+        }
+
+        function money(value) {
+            const numberValue = Number(value || 0);
+            return numberValue.toFixed(2);
+        }
+
+        function showMessage(message, isError = false) {
+            const msg = document.getElementById("msg");
+            msg.innerText = message;
+            msg.className = isError ? "message bad" : "message ok";
+            setTimeout(() => {
+                msg.innerText = "";
+                msg.className = "message";
+            }, 3000);
+        }
+
+        async function requestJson(url, options = {}) {
+            const res = await fetch(url, options);
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                throw new Error(data.message || "Request failed");
+            }
+
+            return data;
+        }
+
+        async function loadAll() {
+            await loadAliasMenuOptions();
+            await Promise.all([
+                loadMenu(),
+                loadAliases(),
+                loadBin(),
+                loadSalesFoods(),
+                loadSales()
+            ]);
+        }
+
+        async function loadMenu() {
+            const menu = await requestJson("/admin/menu");
+            let html = `
+                <tr>
+                    <th>Item</th>
+                    <th>Tamil</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            menu.forEach(row => {
+                html += `
+                    <tr>
+                        <td>${text(row.menu_item)}</td>
+                        <td>${text(row.tamil_word)}</td>
+                        <td>${text(row.category)}</td>
+                        <td>${money(row.price)}</td>
+                        <td>
+                            <div class="btn-row">
+                                <button class="btn-primary btn-small" onclick='editMenuItem(${JSON.stringify(row)})'>Edit</button>
+                                <button class="btn-danger btn-small" onclick="deleteMenuItem(${row.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("menuTable").innerHTML = html;
+            await loadAliasMenuOptions(document.getElementById("aliasMenuId").value);
+        }
+
+        function editMenuItem(row) {
+            editingMenuId = row.id;
+            document.getElementById("menuFormTitle").innerText = "Edit Menu Item";
+            document.getElementById("menuItem").value = text(row.menu_item);
+            document.getElementById("tamilWord").value = text(row.tamil_word);
+            document.getElementById("category").value = text(row.category);
+            document.getElementById("menuPrice").value = text(row.price);
+        }
+
+        function resetMenuForm() {
+            editingMenuId = null;
+            document.getElementById("menuFormTitle").innerText = "Add Menu Item";
+            document.getElementById("menuItem").value = "";
+            document.getElementById("tamilWord").value = "";
+            document.getElementById("category").value = "";
+            document.getElementById("menuPrice").value = "";
+        }
+
+        async function saveMenuItem() {
+            const payload = {
+                menu_item: document.getElementById("menuItem").value.trim(),
+                tamil_word: document.getElementById("tamilWord").value.trim(),
+                category: document.getElementById("category").value.trim(),
+                price: document.getElementById("menuPrice").value
+            };
+
+            if (!payload.menu_item || !payload.price) {
+                showMessage("Enter food name and price", true);
+                return;
+            }
+
+            try {
+                const url = editingMenuId ? `/admin/menu/${editingMenuId}` : "/admin/menu";
+                const method = editingMenuId ? "PUT" : "POST";
+
+                const data = await requestJson(url, {
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                showMessage(data.message || "Menu saved");
+                resetMenuForm();
+                await loadMenu();
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function deleteMenuItem(id) {
+            if (!confirm("Move this menu item to bin?")) return;
+
+            try {
+                const data = await requestJson(`/admin/menu/${id}`, { method: "DELETE" });
+                showMessage(data.message || "Menu item moved to bin");
+                await Promise.all([loadMenu(), loadBin()]);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function loadAliasMenuOptions(selectedId = "") {
+            const menu = await requestJson("/admin/menu");
+            const select = document.getElementById("aliasMenuId");
+
+            select.innerHTML = `<option value="">Select Food</option>`;
+
+            menu.forEach(row => {
+                const option = document.createElement("option");
+                option.value = row.id;
+                option.innerText = row.menu_item;
+                select.appendChild(option);
+            });
+
+            select.value = selectedId ? String(selectedId) : "";
+        }
+
+        async function loadAliases() {
+            const aliases = await requestJson("/admin/aliases");
+            let html = `
+                <tr>
+                    <th>Item</th>
+                    <th>Alias</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            aliases.forEach(row => {
+                html += `
+                    <tr>
+                        <td>${text(row.menu_item)}</td>
+                        <td>${text(row.alias)}</td>
+                        <td>
+                            <div class="btn-row">
+                                <button class="btn-primary btn-small" onclick='editAlias(${JSON.stringify(row)})'>Edit</button>
+                                <button class="btn-danger btn-small" onclick="deleteAlias(${row.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("aliasTable").innerHTML = html;
+        }
+
+        function editAlias(row) {
+            editingAliasId = row.id;
+            document.getElementById("aliasFormTitle").innerText = "Edit Alias";
+            document.getElementById("aliasMenuId").value = String(row.menu_id);
+            document.getElementById("aliasText").value = text(row.alias);
+        }
+
+        function resetAliasForm() {
+            editingAliasId = null;
+            document.getElementById("aliasFormTitle").innerText = "Add Alias";
+            document.getElementById("aliasMenuId").value = "";
+            document.getElementById("aliasText").value = "";
+        }
+
+        async function saveAlias() {
+            const menuId = document.getElementById("aliasMenuId").value;
+            const aliasText = document.getElementById("aliasText").value;
+
+            if (!menuId || !aliasText.trim()) {
+                showMessage("Select food and enter alias", true);
+                return;
+            }
+
+            try {
+                const url = editingAliasId ? `/admin/aliases/${editingAliasId}` : "/admin/aliases";
+                const method = editingAliasId ? "PUT" : "POST";
+                const payload = editingAliasId
+                    ? { menu_id: menuId, alias: aliasText.trim() }
+                    : { menu_id: menuId, aliases: aliasText };
+
+                const data = await requestJson(url, {
+                    method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                showMessage(data.message || "Alias saved");
+                resetAliasForm();
+                await Promise.all([loadAliases(), loadBin()]);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function deleteAlias(id) {
+            if (!confirm("Move this alias to bin?")) return;
+
+            try {
+                const data = await requestJson(`/admin/aliases/${id}`, { method: "DELETE" });
+                showMessage(data.message || "Alias moved to bin");
+                await Promise.all([loadAliases(), loadBin()]);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function loadBin() {
+            const bin = await requestJson("/admin/bin");
+
+            let menuHtml = `
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Restore</th>
+                </tr>
+            `;
+
+            bin.menu_items.forEach(row => {
+                menuHtml += `
+                    <tr>
+                        <td>${text(row.menu_item)}</td>
+                        <td>${money(row.price)}</td>
+                        <td><button class="btn-success btn-small" onclick="restoreMenuItem(${row.id})">Restore</button></td>
+                    </tr>
+                `;
+            });
+
+            let aliasHtml = `
+                <tr>
+                    <th>Item</th>
+                    <th>Alias</th>
+                    <th>Restore</th>
+                </tr>
+            `;
+
+            bin.food_aliases.forEach(row => {
+                aliasHtml += `
+                    <tr>
+                        <td>${text(row.menu_item)}</td>
+                        <td>${text(row.alias)}</td>
+                        <td><button class="btn-success btn-small" onclick="restoreAlias(${row.id})">Restore</button></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("binMenuTable").innerHTML = menuHtml;
+            document.getElementById("binAliasTable").innerHTML = aliasHtml;
+        }
+
+        async function restoreMenuItem(id) {
+            try {
+                const data = await requestJson(`/admin/bin/menu/${id}/restore`, { method: "POST" });
+                showMessage(data.message || "Menu item restored");
+                await Promise.all([loadMenu(), loadBin()]);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function restoreAlias(id) {
+            try {
+                const data = await requestJson(`/admin/bin/aliases/${id}/restore`, { method: "POST" });
+                showMessage(data.message || "Alias restored");
+                await Promise.all([loadAliases(), loadBin()]);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        async function loadSalesFoods() {
+            const foods = await requestJson("/admin/sales/foods");
+            const select = document.getElementById("foodFilter");
+            const currentValue = select.value;
+
+            select.innerHTML = `<option value="">All Foods</option>`;
+
+            foods.forEach(food => {
+                const option = document.createElement("option");
+                option.value = food;
+                option.innerText = food;
+                select.appendChild(option);
+            });
+
+            select.value = currentValue;
+        }
+
+        function salesQueryString() {
+            const params = new URLSearchParams();
+            const date = document.getElementById("filterDate").value.trim();
+            const startDate = document.getElementById("startDate").value.trim();
+            const endDate = document.getElementById("endDate").value.trim();
+            const foodName = document.getElementById("foodFilter").value.trim();
+
+            if (date) params.set("date", date);
+            if (startDate) params.set("start_date", startDate);
+            if (endDate) params.set("end_date", endDate);
+            if (foodName) params.set("food_name", foodName);
+
+            return params.toString();
+        }
+
+        async function loadSales() {
+            try {
+                const query = salesQueryString();
+                const sales = await requestJson(query ? `/admin/sales?${query}` : "/admin/sales");
+
+                let html = `
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Food</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                `;
+
+                let qtyTotal = 0;
+                let amountTotal = 0;
+
+                sales.forEach(row => {
+                    qtyTotal += Number(row.quantity || 0);
+                    amountTotal += Number(row.total || 0);
+
+                    html += `
+                        <tr>
+                            <td>${text(row.id)}</td>
+                            <td>${text(row.date)}</td>
+                            <td>${text(row.food_name)}</td>
+                            <td>${text(row.quantity)}</td>
+                            <td>${money(row.price)}</td>
+                            <td>${money(row.total)}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById("salesTable").innerHTML = html;
+                document.getElementById("salesRows").innerText = sales.length;
+                document.getElementById("salesQty").innerText = qtyTotal;
+                document.getElementById("salesTotal").innerText = money(amountTotal);
+            } catch (err) {
+                showMessage(err.message, true);
+            }
+        }
+
+        function clearSalesFilters() {
+            document.getElementById("filterDate").value = "";
+            document.getElementById("startDate").value = "";
+            document.getElementById("endDate").value = "";
+            document.getElementById("foodFilter").value = "";
+            loadSales();
+        }
+
+        function downloadSalesPdf() {
+            const query = salesQueryString();
+            window.location.href = query ? `/admin/sales/pdf?${query}` : "/admin/sales/pdf";
+        }
+
+        loadAll().catch(err => showMessage(err.message, true));
+    </script>
+</body>
+
+</html>

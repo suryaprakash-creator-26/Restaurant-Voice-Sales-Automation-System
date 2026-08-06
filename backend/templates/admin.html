@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Admin Dashboard</title>
+ <style>
+ * {
+ box-sizing: border-box;
+ }
+ body {
+ font-family: Arial, sans-serif;
+ background: #f4f6f9;
+ color: #111827;
+ margin: 0;
+ padding: 18px;
+ }
+ h1 {
+ text-align: center;
+ margin: 12px 0 22px;
+ font-size: 32px;
+ }
+ h2 {
+ margin: 0;
+ font-size: 24px;
+ }
+ h3 {
+ margin: 18px 0 10px;
+ }
+ label {
+ display: block;
+ margin-bottom: 5px;
+ font-weight: 700;
+ font-size: 13px;
+ }
+ input,
+ select,
+ textarea {
+ width: 100%;
+ padding: 10px;
+ border: 1px solid #cbd5e1;
+ border-radius: 5px;
+ font-size: 14px;
+ font-family: Arial, sans-serif;
+ background: #fff;
+ }
+ textarea {
+ min-height: 92px;
+ resize: vertical;
+ }
+ button {
+ padding: 10px 13px;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+ font-weight: 700;
+ white-space: nowrap;
+ transition: opacity 0.2s;
+ }
+ button:hover {
+ opacity: 0.9;
+ }
+ table {
+ width: 100%;
+ border-collapse: collapse;
+ min-width: 720px;
+ }
+ th,
+ td {
+ padding: 10px;
+ border-bottom: 1px solid #e5e7eb;
+ text-align: left;
+ vertical-align: middle;
+ }
+ th {
+ background: #0b7ff3;
+ color: #fff;
+ position: sticky;
+ top: 0;
+ z-index: 1;
+ }
+ tr:hover td {
+ background: #f8fafc;
+ }
+ .page {
+ max-width: 1500px;
+ margin: 0 auto;
+ }
+ .tabs {
+ display: grid;
+ grid-template-columns: repeat(4, 1fr);
+ gap: 10px;
+ margin-bottom: 14px;
+ }
+ .tab-btn {
+ background: #e2e8f0;
+ color: #0f172a;
+ font-size: 15px;
+ }
+ .tab-btn.active {
+ background: #0b7ff3;
+ color: #fff;
+ }
+ .panel {
+ display: none;
+ background: #fff;
+ border-radius: 8px;
+ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ padding: 18px;
+ }
+ .panel.active {
+ display: block;
+ }
+ .panel-head {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 12px;
+ margin-bottom: 14px;
+ }
+ .filters {
+ display: grid;
+ grid-template-columns: repeat(5, minmax(150px, 1fr));
+ gap: 12px;
+ align-items: end;
+ margin-bottom: 14px;
+ padding: 12px;
+ background: #f8fafc;
+ border: 1px solid #e2e8f0;
+ border-radius: 6px;
+ }
+ .form-grid {
+ display: grid;
+ grid-template-columns: repeat(4, minmax(150px, 1fr));
+ gap: 12px;
+ align-items: end;
+ }
+ .alias-form-grid {
+ display: grid;
+ grid-template-columns: minmax(180px, 1fr) minmax(260px, 2fr);
+ gap: 12px;
+ align-items: start;
+ }
+ .scroll {
+ width: 100%;
+ max-height: 560px;
+ overflow: auto;
+ border: 1px solid #e5e7eb;
+ border-radius: 6px;
+ }
+ .btn-row {
+ display: flex;
+ gap: 8px;
+ align-items: center;
+ flex-wrap: wrap;
+ }
+ .btn-primary {
+ background: #0b7ff3;
+ color: #fff;
+ }
+ .btn-success {
+ background: #22a447;
+ color: #fff;
+ }
+ .btn-danger {
+ background: #dc2626;
+ color: #fff;
+ }
+ .btn-muted {
+ background: #64748b;
+ color: #fff;
+ }
+ .btn-small {
+ padding: 7px 9px;
+ font-size: 12px;
+ }
+ 
+ /* Updated message toast styling */
+ .message {
+ position: fixed;
+ top: 20px;
+ left: 50%;
+ transform: translateX(-50%) translateY(-20px);
+ min-width: 300px;
+ text-align: center;
+ padding: 12px 20px;
+ border-radius: 8px;
+ font-weight: 700;
+ font-size: 15px;
+ z-index: 9999;
+ opacity: 0;
+ transition: all 0.3s ease;
+ pointer-events: none;
+ box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+ }
+ .message.active {
+ opacity: 1;
+ transform: translateX(-50%) translateY(0);
+ }
+ .ok {
+ background: #dcfce7;
+ color: #15803d;
+ border: 1px solid #4ade80;
+ }
+ .bad {
+ background: #fee2e2;
+ color: #b91c1c;
+ border: 1px solid #f87171;
+ }
+ .info {
+ background: #e0f2fe;
+ color: #0369a1;
+ border: 1px solid #7dd3fc;
+ }
+ 
+ .hint {
+ color: #64748b;
+ font-size: 13px;
+ margin-top: 6px;
+ }
+ .split {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 16px;
+ }
+ @media (max-width: 1100px) {
+ .tabs {
+ grid-template-columns: repeat(2, 1fr);
+ }
+ .filters,
+ .form-grid,
+ .alias-form-grid,
+ .split {
+ grid-template-columns: repeat(2, minmax(150px, 1fr));
+ }
+ }
+ @media (max-width: 640px) {
+ body {
+ padding: 10px;
+ }
+ h1 {
+ font-size: 25px;
+ }
+ .tabs,
+ .filters,
+ .form-grid,
+ .alias-form-grid,
+ .split {
+ grid-template-columns: 1fr;
+ }
+ .panel-head {
+ align-items: stretch;
+ flex-direction: column;
+ }
+ }
+ </style>
+</head>
+<body>
+ <div class="page">
+ <h1>Voice Sales Admin Dashboard</h1>
+ 
+ <div class="tabs">
+ <button class="tab-btn active" id="tabMenuBtn" onclick="showPanel('menu')">Menu Items</button>
+ <button class="tab-btn" id="tabAliasBtn" onclick="showPanel('aliases')">Food Aliases</button>
+ <button class="tab-btn" id="tabSalesBtn" onclick="showPanel('sales')">Sales Data</button>
+ <button class="tab-btn" id="tabBinBtn" onclick="showPanel('bin')">Bin</button>
+ </div>
+ 
+ <div id="msg" class="message"></div>
+ 
+ <section class="panel active" id="panelMenu">
+ <div class="panel-head">
+ <h2>Menu Items</h2>
+ <button class="btn-muted" onclick="resetMenuFilters()">Show All</button>
+ </div>
+ <div class="filters">
+ <div>
+ <label for="menuFilterItem">Food</label>
+ <select id="menuFilterItem" onchange="renderMenuTable()">
+ <option value="">All Foods</option>
+ </select>
+ </div>
+ <div>
+ <label for="menuFilterCategory">Category</label>
+ <select id="menuFilterCategory" onchange="renderMenuTable()">
+ <option value="">All Categories</option>
+ </select>
+ </div>
+ </div>
+ <div class="scroll">
+ <table id="menuTable"></table>
+ </div>
+ 
+ <h3 id="menuFormTitle">Add Menu Item</h3>
+ <div class="form-grid">
+ <div>
+ <label for="menuItem">Food Name</label>
+ <input type="text" id="menuItem" placeholder="IDLI">
+ </div>
+ <div>
+ <label for="tamilWord">Tamil Word</label>
+ <input type="text" id="tamilWord" placeholder="Optional">
+ </div>
+ <div>
+ <label for="category">Category</label>
+ <select id="category"></select>
+ <input type="text" id="newCategory" placeholder="New category" style="display:none; margin-top:8px;">
+ </div>
+ <div>
+ <label for="menuPrice">Price</label>
+ <input type="number" id="menuPrice" placeholder="30">
+ </div>
+ </div>
+ <div class="btn-row" style="margin-top: 12px;">
+ <button class="btn-success" onclick="saveMenuItem()">Save Menu Item</button>
+ <button class="btn-muted" onclick="resetMenuForm()">Clear</button>
+ </div>
+ </section>
+ 
+ <section class="panel" id="panelAliases">
+ <div class="panel-head">
+ <h2>Food Aliases</h2>
+ <button class="btn-muted" onclick="resetAliasFilters()">Show All</button>
+ </div>
+ <div class="filters">
+ <div>
+ <label for="aliasFilterFood">Food</label>
+ <select id="aliasFilterFood" onchange="renderAliasTable()">
+ <option value="">All Foods</option>
+ </select>
+ </div>
+ </div>
+ <div class="scroll">
+ <table id="aliasTable"></table>
+ </div>
+ 
+ <h3 id="aliasFormTitle">Add Alias</h3>
+ <div class="alias-form-grid">
+ <div>
+ <label for="aliasMenuId">Food Name</label>
+ <select id="aliasMenuId">
+ <option value="">Select Food</option>
+ </select>
+ </div>
+ <div>
+ <label for="aliasText">Alias</label>
+ <textarea id="aliasText" placeholder="idly, idliii&#10;itleeee"></textarea>
+ <div class="hint">For many aliases, choose one food and put each alias separated by comma or new line.</div>
+ </div>
+ </div>
+ <div class="btn-row" style="margin-top: 12px;">
+ <button class="btn-success" onclick="saveAlias()">Save Alias</button>
+ <button class="btn-muted" onclick="resetAliasForm()">Clear</button>
+ </div>
+ </section>
+ 
+ <section class="panel" id="panelSales">
+ <div class="panel-head">
+ <h2>Sales Data</h2>
+ <div class="btn-row">
+ <!-- Refresh button added below -->
+ <button class="btn-primary" onclick="loadSales()">Refresh</button>
+ <button class="btn-muted" onclick="clearSalesFilters()">Show All</button>
+ <button class="btn-success" onclick="downloadSalesPdf()">Download PDF</button>
+ </div>
+ </div>
+ <div class="filters">
+ <div>
+ <label for="filterDate">Exact Date</label>
+ <select id="filterDate" onchange="loadSales()">
+ <option value="">All Dates</option>
+ </select>
+ </div>
+ <div>
+ <label for="startDate">Start Date</label>
+ <select id="startDate" onchange="loadSales()">
+ <option value="">No Start Date</option>
+ </select>
+ </div>
+ <div>
+ <label for="endDate">End Date</label>
+ <select id="endDate" onchange="loadSales()">
+ <option value="">No End Date</option>
+ </select>
+ </div>
+ <div>
+ <label for="foodFilter">Food</label>
+ <select id="foodFilter" onchange="loadSales()">
+ <option value="">All Foods</option>
+ </select>
+ </div>
+ </div>
+ <div class="scroll">
+ <table id="salesTable"></table>
+ </div>
+ </section>
+ 
+ <section class="panel" id="panelBin">
+ <div class="panel-head">
+ <h2>Bin</h2>
+ </div>
+ <!-- Stacked vertically instead of .split class -->
+ <div style="margin-bottom: 30px;">
+ <h3>Deleted Menu Items</h3>
+ <div class="scroll" style="max-height: 430px;">
+ <table id="binMenuTable"></table>
+ </div>
+ </div>
+ <div>
+ <h3>Deleted Aliases</h3>
+ <div class="scroll" style="max-height: 430px;">
+ <table id="binAliasTable"></table>
+ </div>
+ </div>
+ </section>
+ 
+ </div>
+ 
+ <script>
+ let editingMenuId = null;
+ let editingAliasId = null;
+ let menuRows = [];
+ let aliasRows = [];
+ let salesDateOptions = [];
+ 
+ function text(value) {
+ return value === null || value === undefined ? "" : String(value);
+ }
+ 
+ function money(value) {
+ const numberValue = Number(value || 0);
+ return numberValue.toFixed(2);
+ }
+ 
+ function showMessage(message, type = "ok") {
+ // Backwards compatibility if true/false was passed
+ if (type === true) type = "bad";
+ if (type === false) type = "ok";
+ 
+ const msg = document.getElementById("msg");
+ msg.innerText = message;
+ msg.className = `message active ${type}`;
+ 
+ if (window.msgTimeout) clearTimeout(window.msgTimeout);
+ 
+ window.msgTimeout = setTimeout(() => {
+ msg.classList.remove("active");
+ }, 3000);
+ }
+ 
+ async function requestJson(url, options = {}) {
+ const res = await fetch(url, options);
+ const data = await res.json().catch(() => ({}));
+ if (!res.ok) {
+ throw new Error(data.message || "Request failed");
+ }
+ return data;
+ }
+ 
+ function showPanel(name) {
+ const map = {
+ menu: ["panelMenu", "tabMenuBtn"],
+ aliases: ["panelAliases", "tabAliasBtn"],
+ sales: ["panelSales", "tabSalesBtn"],
+ bin: ["panelBin", "tabBinBtn"]
+ };
+ Object.values(map).forEach(([panelId, btnId]) => {
+ document.getElementById(panelId).classList.remove("active");
+ document.getElementById(btnId).classList.remove("active");
+ });
+ document.getElementById(map[name][0]).classList.add("active");
+ document.getElementById(map[name][1]).classList.add("active");
+ }
+ 
+ function fillSelect(selectId, values, firstLabel, selectedValue = "") {
+ const select = document.getElementById(selectId);
+ select.innerHTML = `<option value="">${firstLabel}</option>`;
+ values.forEach(value => {
+ const option = document.createElement("option");
+ option.value = value;
+ option.innerText = value;
+ select.appendChild(option);
+ });
+ select.value = selectedValue;
+ }
+ 
+ function uniqueSorted(values) {
+ return [...new Set(values.filter(value => text(value).trim() !== ""))]
+ .sort((a, b) => text(a).localeCompare(text(b)));
+ }
+ 
+ async function loadAll() {
+ await loadMenu();
+ await Promise.all([
+ loadAliases(),
+ loadBin(),
+ loadSalesFoods(),
+ loadSalesDateOptions()
+ ]);
+ await loadSales();
+ }
+ 
+ async function loadMenu() {
+ menuRows = await requestJson("/admin/menu");
+ refreshMenuControls();
+ renderMenuTable();
+ }
+ 
+ function refreshMenuControls() {
+ const foodNames = uniqueSorted(menuRows.map(row => row.menu_item));
+ const categories = uniqueSorted(menuRows.map(row => row.category));
+ const currentCategory = document.getElementById("category").value;
+ 
+ fillSelect("menuFilterItem", foodNames, "All Foods", document.getElementById("menuFilterItem").value);
+ fillSelect("menuFilterCategory", categories, "All Categories", document.getElementById("menuFilterCategory").value);
+ fillSelect("aliasFilterFood", foodNames, "All Foods", document.getElementById("aliasFilterFood").value);
+ 
+ const aliasSelect = document.getElementById("aliasMenuId");
+ const selectedAliasMenuId = aliasSelect.value;
+ aliasSelect.innerHTML = `<option value="">Select Food</option>`;
+ menuRows.forEach(row => {
+ const option = document.createElement("option");
+ option.value = row.id;
+ option.innerText = row.menu_item;
+ aliasSelect.appendChild(option);
+ });
+ aliasSelect.value = selectedAliasMenuId;
+ 
+ const categorySelect = document.getElementById("category");
+ categorySelect.innerHTML = `<option value="">Select Category</option>`;
+ categories.forEach(category => {
+ const option = document.createElement("option");
+ option.value = category;
+ option.innerText = category;
+ categorySelect.appendChild(option);
+ });
+ 
+ const newOption = document.createElement("option");
+ newOption.value = "__new__";
+ newOption.innerText = "Add New Category";
+ categorySelect.appendChild(newOption);
+ categorySelect.value = categories.includes(currentCategory) ? currentCategory : "";
+ categorySelect.onchange = toggleNewCategory;
+ }
+ 
+ function toggleNewCategory() {
+ const select = document.getElementById("category");
+ const input = document.getElementById("newCategory");
+ input.style.display = select.value === "__new__" ? "block" : "none";
+ }
+ 
+ function renderMenuTable() {
+ const foodFilter = document.getElementById("menuFilterItem").value;
+ const categoryFilter = document.getElementById("menuFilterCategory").value;
+ const filtered = menuRows.filter(row => {
+ const foodOk = !foodFilter || row.menu_item === foodFilter;
+ const categoryOk = !categoryFilter || row.category === categoryFilter;
+ return foodOk && categoryOk;
+ });
+ 
+ let html = `
+ <tr>
+ <th>Item</th>
+ <th>Tamil</th>
+ <th>Category</th>
+ <th>Price</th>
+ <th>Action</th>
+ </tr>
+ `;
+ filtered.forEach(row => {
+ html += `
+ <tr>
+ <td>${text(row.menu_item)}</td>
+ <td>${text(row.tamil_word)}</td>
+ <td>${text(row.category)}</td>
+ <td>${money(row.price)}</td>
+ <td>
+ <div class="btn-row">
+ <button class="btn-primary btn-small" onclick='editMenuItem(${JSON.stringify(row)})'>Edit</button>
+ <button class="btn-danger btn-small" onclick="deleteMenuItem(${row.id})">Delete</button>
+ </div>
+ </td>
+ </tr>
+ `;
+ });
+ document.getElementById("menuTable").innerHTML = html;
+ }
+ 
+ function resetMenuFilters() {
+ document.getElementById("menuFilterItem").value = "";
+ document.getElementById("menuFilterCategory").value = "";
+ renderMenuTable();
+ }
+ 
+ function editMenuItem(row) {
+ editingMenuId = row.id;
+ const title = document.getElementById("menuFormTitle");
+ title.innerText = "Edit Menu Item";
+ document.getElementById("menuItem").value = text(row.menu_item);
+ document.getElementById("tamilWord").value = text(row.tamil_word);
+ document.getElementById("category").value = text(row.category);
+ document.getElementById("newCategory").value = "";
+ toggleNewCategory();
+ document.getElementById("menuPrice").value = text(row.price);
+ 
+ // Scroll to edit box smoothly
+ title.scrollIntoView({ behavior: 'smooth', block: 'center' });
+ }
+ 
+ function resetMenuForm() {
+ editingMenuId = null;
+ document.getElementById("menuFormTitle").innerText = "Add Menu Item";
+ document.getElementById("menuItem").value = "";
+ document.getElementById("tamilWord").value = "";
+ document.getElementById("category").value = "";
+ document.getElementById("newCategory").value = "";
+ document.getElementById("newCategory").style.display = "none";
+ document.getElementById("menuPrice").value = "";
+ }
+ 
+ async function saveMenuItem() {
+ const selectedCategory = document.getElementById("category").value;
+ const newCategory = document.getElementById("newCategory").value.trim();
+ const category = selectedCategory === "__new__" ? newCategory : selectedCategory;
+ const payload = {
+ menu_item: document.getElementById("menuItem").value.trim(),
+ tamil_word: document.getElementById("tamilWord").value.trim(),
+ category: category,
+ price: document.getElementById("menuPrice").value
+ };
+ 
+ if (!payload.menu_item || !payload.price) {
+ showMessage("Enter food name and price", "bad");
+ return;
+ }
+ if (selectedCategory === "__new__" && !newCategory) {
+ showMessage("Enter new category name", "bad");
+ return;
+ }
+ 
+ // Immediate feedback so UI doesn't feel slow
+ showMessage("Processing...", "info");
+ 
+ try {
+ const url = editingMenuId ? `/admin/menu/${editingMenuId}` : "/admin/menu";
+ const method = editingMenuId ? "PUT" : "POST";
+ const data = await requestJson(url, {
+ method,
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify(payload)
+ });
+ 
+ showMessage(data.message || "Menu saved", "ok");
+ resetMenuForm();
+ 
+ // Let these load in background to keep UI snappy
+ loadMenu();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ async function deleteMenuItem(id) {
+ if (!confirm("Move this menu item to bin?")) return;
+ 
+ showMessage("Processing...", "info");
+ 
+ try {
+ const data = await requestJson(`/admin/menu/${id}`, { method: "DELETE" });
+ showMessage(data.message || "Menu item moved to bin", "ok");
+ 
+ loadMenu();
+ loadBin();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ async function loadAliases() {
+ aliasRows = await requestJson("/admin/aliases");
+ renderAliasTable();
+ }
+ 
+ function renderAliasTable() {
+ const foodFilter = document.getElementById("aliasFilterFood").value;
+ const filtered = aliasRows.filter(row => !foodFilter || row.menu_item === foodFilter);
+ let html = `
+ <tr>
+ <th>Item</th>
+ <th>Alias</th>
+ <th>Action</th>
+ </tr>
+ `;
+ filtered.forEach(row => {
+ html += `
+ <tr>
+ <td>${text(row.menu_item)}</td>
+ <td>${text(row.alias)}</td>
+ <td>
+ <div class="btn-row">
+ <button class="btn-primary btn-small" onclick='editAlias(${JSON.stringify(row)})'>Edit</button>
+ <button class="btn-danger btn-small" onclick="deleteAlias(${row.id})">Delete</button>
+ </div>
+ </td>
+ </tr>
+ `;
+ });
+ document.getElementById("aliasTable").innerHTML = html;
+ }
+ 
+ function resetAliasFilters() {
+ document.getElementById("aliasFilterFood").value = "";
+ renderAliasTable();
+ }
+ 
+ function editAlias(row) {
+ editingAliasId = row.id;
+ const title = document.getElementById("aliasFormTitle");
+ title.innerText = "Edit Alias";
+ 
+ const select = document.getElementById("aliasMenuId");
+ select.value = row.menu_id ? String(row.menu_id) : "";
+ 
+ // Fallback: If option didn't match via ID, match via inner text
+ if (!select.value) {
+ const option = Array.from(select.options).find(opt => opt.innerText === row.menu_item);
+ if (option) select.value = option.value;
+ }
+ 
+ document.getElementById("aliasText").value = text(row.alias);
+ 
+ // Scroll to edit box smoothly
+ title.scrollIntoView({ behavior: 'smooth', block: 'center' });
+ }
+ 
+ function resetAliasForm() {
+ editingAliasId = null;
+ document.getElementById("aliasFormTitle").innerText = "Add Alias";
+ document.getElementById("aliasMenuId").value = "";
+ document.getElementById("aliasText").value = "";
+ }
+ 
+ async function saveAlias() {
+ const menuId = document.getElementById("aliasMenuId").value;
+ const aliasText = document.getElementById("aliasText").value;
+ 
+ if (!menuId || !aliasText.trim()) {
+ showMessage("Select food and enter alias", "bad");
+ return;
+ }
+ 
+ showMessage("Processing...", "info");
+ 
+ try {
+ const url = editingAliasId ? `/admin/aliases/${editingAliasId}` : "/admin/aliases";
+ const method = editingAliasId ? "PUT" : "POST";
+ const payload = editingAliasId
+ ? { menu_id: menuId, alias: aliasText.trim() }
+ : { menu_id: menuId, aliases: aliasText };
+ 
+ const data = await requestJson(url, {
+ method,
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify(payload)
+ });
+ 
+ showMessage(data.message || "Alias saved", "ok");
+ resetAliasForm();
+ 
+ loadAliases();
+ loadBin();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ async function deleteAlias(id) {
+ if (!confirm("Move this alias to bin?")) return;
+ 
+ showMessage("Processing...", "info");
+ 
+ try {
+ const data = await requestJson(`/admin/aliases/${id}`, { method: "DELETE" });
+ showMessage(data.message || "Alias moved to bin", "ok");
+ 
+ loadAliases();
+ loadBin();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ async function loadSalesFoods() {
+ const foods = await requestJson("/admin/sales/foods");
+ fillSelect("foodFilter", foods, "All Foods", document.getElementById("foodFilter").value);
+ }
+ 
+ async function loadSalesDateOptions() {
+ const sales = await requestJson("/admin/sales");
+ salesDateOptions = uniqueSorted(sales.map(row => row.date)).reverse();
+ fillSelect("filterDate", salesDateOptions, "All Dates", document.getElementById("filterDate").value);
+ fillSelect("startDate", salesDateOptions, "No Start Date", document.getElementById("startDate").value);
+ fillSelect("endDate", salesDateOptions, "No End Date", document.getElementById("endDate").value);
+ }
+ 
+ function salesQueryString() {
+ const params = new URLSearchParams();
+ const date = document.getElementById("filterDate").value;
+ const startDate = document.getElementById("startDate").value;
+ const endDate = document.getElementById("endDate").value;
+ const foodName = document.getElementById("foodFilter").value;
+ if (date) params.set("date", date);
+ if (startDate) params.set("start_date", startDate);
+ if (endDate) params.set("end_date", endDate);
+ if (foodName) params.set("food_name", foodName);
+ return params.toString();
+ }
+ 
+ async function loadSales() {
+ try {
+ const query = salesQueryString();
+ const sales = await requestJson(query ? `/admin/sales?${query}` : "/admin/sales");
+ let html = `
+ <tr>
+ <th>ID</th>
+ <th>Date</th>
+ <th>Food</th>
+ <th>Qty</th>
+ <th>Price</th>
+ <th>Total</th>
+ </tr>
+ `;
+ sales.forEach(row => {
+ html += `
+ <tr>
+ <td>${text(row.id)}</td>
+ <td>${text(row.date)}</td>
+ <td>${text(row.food_name)}</td>
+ <td>${text(row.quantity)}</td>
+ <td>${money(row.price)}</td>
+ <td>${money(row.total)}</td>
+ </tr>
+ `;
+ });
+ document.getElementById("salesTable").innerHTML = html;
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ function clearSalesFilters() {
+ document.getElementById("filterDate").value = "";
+ document.getElementById("startDate").value = "";
+ document.getElementById("endDate").value = "";
+ document.getElementById("foodFilter").value = "";
+ loadSales();
+ }
+ 
+ function downloadSalesPdf() {
+ const query = salesQueryString();
+ window.location.href = query ? `/admin/sales/pdf?${query}` : "/admin/sales/pdf";
+ }
+ 
+ async function loadBin() {
+ const bin = await requestJson("/admin/bin");
+ let menuHtml = `
+ <tr>
+ <th>Item</th>
+ <th>Price</th>
+ <th>Restore</th>
+ </tr>
+ `;
+ bin.menu_items.forEach(row => {
+ menuHtml += `
+ <tr>
+ <td>${text(row.menu_item)}</td>
+ <td>${money(row.price)}</td>
+ <td><button class="btn-success btn-small" onclick="restoreMenuItem(${row.id})">Restore</button></td>
+ </tr>
+ `;
+ });
+ 
+ let aliasHtml = `
+ <tr>
+ <th>Item</th>
+ <th>Alias</th>
+ <th>Restore</th>
+ </tr>
+ `;
+ bin.food_aliases.forEach(row => {
+ aliasHtml += `
+ <tr>
+ <td>${text(row.menu_item)}</td>
+ <td>${text(row.alias)}</td>
+ <td><button class="btn-success btn-small" onclick="restoreAlias(${row.id})">Restore</button></td>
+ </tr>
+ `;
+ });
+ document.getElementById("binMenuTable").innerHTML = menuHtml;
+ document.getElementById("binAliasTable").innerHTML = aliasHtml;
+ }
+ 
+ async function restoreMenuItem(id) {
+ showMessage("Processing...", "info");
+ try {
+ const data = await requestJson(`/admin/bin/menu/${id}/restore`, { method: "POST" });
+ showMessage(data.message || "Menu item restored", "ok");
+ 
+ loadMenu();
+ loadBin();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ async function restoreAlias(id) {
+ showMessage("Processing...", "info");
+ try {
+ const data = await requestJson(`/admin/bin/aliases/${id}/restore`, { method: "POST" });
+ showMessage(data.message || "Alias restored", "ok");
+ 
+ loadAliases();
+ loadBin();
+ } catch (err) {
+ showMessage(err.message, "bad");
+ }
+ }
+ 
+ loadAll().catch(err => showMessage(err.message, "bad"));
+ </script>
+</body>
+</html>
